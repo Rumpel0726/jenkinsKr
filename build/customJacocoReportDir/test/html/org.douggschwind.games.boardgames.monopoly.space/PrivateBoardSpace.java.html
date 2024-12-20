@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PrivateBoardSpace.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">games</a> &gt; <a href="index.source.html" class="el_package">org.douggschwind.games.boardgames.monopoly.space</a> &gt; <span class="el_source">PrivateBoardSpace.java</span></div><h1>PrivateBoardSpace.java</h1><pre class="source lang-java linenums">package org.douggschwind.games.boardgames.monopoly.space;
+
+import org.douggschwind.games.boardgames.monopoly.title.Title;
+
+/**
+ * Instances of this class represent board spaces that can be privately held and thus
+ * purchased or sold by a player. One of the properties, railroads, or utilities.
+ * @author Doug Gschwind
+ */
+public abstract class PrivateBoardSpace&lt;T extends Title&gt; extends BoardSpace {
+	
+	private final T title;
+
+	protected PrivateBoardSpace(T title) {
+<span class="nc" id="L15">		super(title.getName());</span>
+<span class="nc" id="L16">		this.title = title;</span>
+<span class="nc" id="L17">	}</span>
+	
+	@Override
+	public final boolean canBePrivatelyHeld() {
+<span class="nc" id="L21">		return true;</span>
+	}
+	
+	@Override
+	public final void resetOwnership() {
+<span class="nc" id="L26">		getTitle().setOwner(null);</span>
+<span class="nc" id="L27">	}</span>
+	
+	public final T getTitle() {
+<span class="nc" id="L30">		return title;</span>
+	}
+	
+	public int getPurchasePrice() {
+<span class="nc" id="L34">		return getTitle().getPurchasePrice();</span>
+	}
+	
+	public int getMortgageValue() {
+<span class="nc" id="L38">		return getTitle().getMortgageValue();</span>
+	}
+	
+	public boolean isProperty() {
+<span class="nc" id="L42">		return false;</span>
+	}
+	
+	public boolean isRailroad() {
+<span class="nc" id="L46">		return false;</span>
+	}
+	
+	public boolean isUtility() {
+<span class="nc" id="L50">		return false;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

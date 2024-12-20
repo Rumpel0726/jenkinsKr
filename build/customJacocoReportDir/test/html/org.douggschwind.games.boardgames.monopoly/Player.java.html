@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Player.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">games</a> &gt; <a href="index.source.html" class="el_package">org.douggschwind.games.boardgames.monopoly</a> &gt; <span class="el_source">Player.java</span></div><h1>Player.java</h1><pre class="source lang-java linenums">package org.douggschwind.games.boardgames.monopoly;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.douggschwind.games.boardgames.monopoly.policy.AssetLiquidationPolicy;
+import org.douggschwind.games.boardgames.monopoly.policy.UseOfGetOutOfJailFreeCardPolicy;
+import org.douggschwind.games.boardgames.monopoly.space.PrivateBoardSpace;
+import org.douggschwind.games.boardgames.monopoly.title.MonopolyDefinition;
+import org.douggschwind.games.boardgames.monopoly.title.Title;
+import org.douggschwind.games.boardgames.monopoly.title.TitleDeed;
+
+/**
+ * An instance of this class houses the state of the game for any given Player of the game.
+ * @author Doug Gschwind
+ */
+public class Player {
+	
+<span class="fc" id="L24">	public enum Avatar {</span>
+<span class="fc" id="L25">		Car,</span>
+<span class="fc" id="L26">		Dog,</span>
+<span class="fc" id="L27">		TopHat,</span>
+<span class="fc" id="L28">		Iron,</span>
+<span class="fc" id="L29">		Ship,</span>
+<span class="fc" id="L30">		Shoe,</span>
+<span class="fc" id="L31">		Thimble,</span>
+<span class="fc" id="L32">		Wheelbarrow;</span>
+	}
+	
+	private final String name;
+	private final Avatar avatar; // aka token
+	private final UseOfGetOutOfJailFreeCardPolicy useOfGetOutOfJailFreeCardPolicy;
+	private final AssetLiquidationPolicy assetLiquidationPolicy;
+	private int bankAccountBalance;
+<span class="fc" id="L40">	private final List&lt;TitleDeed&gt; ownedProperties = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L41">	private final List&lt;Title&gt; ownedRailroads = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L42">	private final List&lt;Title&gt; ownedUtilities = new ArrayList&lt;&gt;();</span>
+	private boolean inJail;
+	private int numFailedAttemptsToGetOutOfJail;
+	private boolean holdingGetOutOfJailFreeCard;
+	private boolean bankrupt;
+	
+	public Player(String name,
+			      Avatar avatar,
+			      UseOfGetOutOfJailFreeCardPolicy useOfGetOutOfJailFreeCardPolicy,
+<span class="fc" id="L51">			      AssetLiquidationPolicy assetLiquidationPolicy) {</span>
+<span class="fc" id="L52">		this.name = name;</span>
+<span class="fc" id="L53">		this.avatar = avatar;</span>
+<span class="fc" id="L54">		this.useOfGetOutOfJailFreeCardPolicy = useOfGetOutOfJailFreeCardPolicy;</span>
+<span class="fc" id="L55">		this.assetLiquidationPolicy = assetLiquidationPolicy;</span>
+<span class="fc" id="L56">		bankAccountBalance = 1500;</span>
+<span class="fc" id="L57">	}</span>
+	
+	@Override
+	public boolean equals(Object that) {
+<span class="pc bpc" id="L61" title="1 of 2 branches missed.">		if (that == null) {</span>
+<span class="nc" id="L62">			return false;</span>
+		}
+		
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">		if (!this.getClass().equals(that.getClass())) {</span>
+<span class="nc" id="L66">			return false;</span>
+		}
+		
+<span class="fc" id="L69">		return this.getName().equals(((Player) that).getName());</span>
+	}
+	
+	@Override
+	public int hashCode() {
+<span class="nc" id="L74">		return getName().hashCode();</span>
+	}
+	
+	public DiceRollResult rollDice() {
+<span class="fc" id="L78">		Random random = new Random();</span>
+<span class="fc" id="L79">		int die1Value = random.nextInt(6); // 0 to 5</span>
+<span class="fc" id="L80">		int die2Value = random.nextInt(6); // 0 to 5</span>
+<span class="fc bfc" id="L81" title="All 2 branches covered.">		return new DiceRollResult(2 + die1Value + die2Value, die1Value == die2Value);</span>
+	}
+
+	public int getBankAccountBalance() {
+<span class="fc" id="L85">		return bankAccountBalance;</span>
+	}
+	
+	private void setBankAccountBalance(int newValue) {
+<span class="fc" id="L89">		bankAccountBalance = newValue;</span>
+<span class="fc" id="L90">	}</span>
+	
+	public UseOfGetOutOfJailFreeCardPolicy getUseOfGetOutOfJailFreeCardPolicy() {
+<span class="nc" id="L93">		return useOfGetOutOfJailFreeCardPolicy;</span>
+	}
+	
+	public AssetLiquidationPolicy getAssetLiquidationPolicy() {
+<span class="fc" id="L97">		return assetLiquidationPolicy;</span>
+	}
+
+	public void receivePayment(int paymentAmount) {
+<span class="fc" id="L101">		bankAccountBalance += paymentAmount;</span>
+<span class="fc" id="L102">	}</span>
+	
+	public boolean canPayBillWithCash(int billAmount) {
+<span class="fc bfc" id="L105" title="All 2 branches covered.">		return getBankAccountBalance() &gt;= billAmount;</span>
+	}
+	
+	/**
+	 * Since a Player can sell houses or hotels back to the Bank
+	 * or mortgage a property at any time, those assets are included
+	 * in the result. Mortgaged properties are ignored since those
+	 * can only be sold to other Players.
+	 * @return Will be non-negative.
+	 */
+	private int computePlayerLiquidWorth() {
+<span class="fc" id="L116">		int result = getBankAccountBalance();</span>
+		
+		// Mortgaged titles do not contribute to liquid worth.
+<span class="pc bpc" id="L119" title="1 of 2 branches missed.">		result += getOwnedProperties().stream().filter(titleDeed -&gt; !titleDeed.isMortgaged())</span>
+<span class="fc" id="L120">				.mapToInt(titleDeed -&gt; ((getNumberHousesOnProperty(titleDeed) * titleDeed.getBankHouseBuybackPrice()) +</span>
+<span class="fc" id="L121">						                (getNumberHotelsOnProperty(titleDeed) * titleDeed.getBankHotelBuybackPrice())))</span>
+<span class="fc" id="L122">			    .sum();</span>
+		
+		// Mortgaged railroads do not contribute to liquid worth.
+<span class="pc bpc" id="L125" title="1 of 2 branches missed.">		result += getOwnedRailroads().stream().filter(railroadTitle -&gt; !railroadTitle.isMortgaged()).mapToInt(railroadTitle -&gt; railroadTitle.getMortgageValue()).sum();</span>
+		
+		// Mortgaged utilities do not contribute to liquid worth.
+<span class="pc bpc" id="L128" title="1 of 2 branches missed.">		result += getOwnedUtilities().stream().filter(utilityTitle -&gt; !utilityTitle.isMortgaged()).mapToInt(utilityTitle -&gt; utilityTitle.getMortgageValue()).sum();</span>
+		
+<span class="fc" id="L130">		return result;</span>
+	}
+	
+	/**
+	 * Liquidate houses, hotels, titles as needed to make the necessary payment
+	 * @param billedAmount
+	 * @return The amount in dollars of titles that have been liquidated.
+	 */
+	private int liquidateTitlesToGenerateCash(int billedAmount) {
+<span class="fc" id="L139">		int liquidatedValue = 0;</span>
+<span class="fc bfc" id="L140" title="All 2 branches covered.">		while (liquidatedValue + getBankAccountBalance() &lt; billedAmount) {</span>
+<span class="fc" id="L141">			Title titleToLiquidate = getAssetLiquidationPolicy().identifyNextTitleToLiquidate(this);</span>
+<span class="pc bpc" id="L142" title="1 of 2 branches missed.">			if (titleToLiquidate == null) {</span>
+				// Huh? How could this happen? If we get here,
+				// this is entirely unexpected.
+<span class="nc" id="L145">				return 0;</span>
+			}
+			
+<span class="fc bfc" id="L148" title="All 2 branches covered.">			if (titleToLiquidate.isTitleDeed()) {</span>
+<span class="fc" id="L149">				TitleDeed titleDeedToLiquidate = (TitleDeed) titleToLiquidate;</span>
+<span class="fc" id="L150">				int buildingsLiquidationValue = titleToLiquidate.computeBuildingsLiquidationValue(getNumberHousesOnProperty(titleDeedToLiquidate), getNumberHotelsOnProperty(titleDeedToLiquidate));</span>
+<span class="pc bpc" id="L151" title="1 of 2 branches missed.">				if ((liquidatedValue + getBankAccountBalance() + buildingsLiquidationValue) &gt;= billedAmount) {</span>
+					// We don't need to mortgage the Title, but rather just sell
+					// off at least one house that has been used to improve the
+					// TitleDeed.
+<span class="nc" id="L155">					int amountExceeded = (liquidatedValue + getBankAccountBalance() + buildingsLiquidationValue) - billedAmount;</span>
+<span class="nc" id="L156">					int numberOfHousesThatCanBeRetained = (amountExceeded / titleDeedToLiquidate.getBankHouseBuybackPrice());</span>
+<span class="nc bnc" id="L157" title="All 2 branches missed.">					if (numberOfHousesThatCanBeRetained &gt;= 1) {</span>
+<span class="nc" id="L158">						BuildingSummary buildingSummary = getBuildingSummary(titleDeedToLiquidate);</span>
+<span class="nc" id="L159">						int numberOfHousesLiquidated = buildingSummary.computeDifferenceInNumberOfHouses(numberOfHousesThatCanBeRetained);</span>
+<span class="nc" id="L160">						buildingSummary.clear();</span>
+<span class="nc" id="L161">						buildingSummary.setNumberHouses(numberOfHousesThatCanBeRetained);</span>
+<span class="nc" id="L162">						liquidatedValue += (numberOfHousesLiquidated * titleDeedToLiquidate.getBankHouseBuybackPrice());</span>
+					}
+					
+<span class="nc" id="L165">					return liquidatedValue;</span>
+				} else {
+					// Have to sell off all the buildings as well as mortgage the Title
+<span class="fc" id="L168">					BuildingSummary buildingSummary = getBuildingSummary((TitleDeed) titleToLiquidate);</span>
+<span class="fc" id="L169">					buildingSummary.clear();</span>
+<span class="fc" id="L170">					liquidatedValue += buildingsLiquidationValue;</span>
+				}
+			}
+			
+<span class="fc" id="L174">			titleToLiquidate.setMortgaged(true);</span>
+<span class="fc" id="L175">			liquidatedValue += titleToLiquidate.getMortgageValue();</span>
+<span class="fc" id="L176">		}</span>
+		
+<span class="fc" id="L178">		return liquidatedValue;</span>
+	}
+	
+	/**
+	 * This method resolves any amount that the Player owes to another
+	 * Player or the Bank.
+	 * @param paymentAmount The amount of the payment to be made.
+	 * @return true if the payment could be made, false if the payment
+	 * would bankrupt the Player.
+	 */
+	boolean makePayment(int paymentAmount) {
+<span class="fc bfc" id="L189" title="All 2 branches covered.">		if (computePlayerLiquidWorth() &lt; paymentAmount) {</span>
+<span class="fc" id="L190">			return false;</span>
+		}
+<span class="fc bfc" id="L192" title="All 2 branches covered.">		if (paymentAmount &lt;= getBankAccountBalance()) {</span>
+<span class="fc" id="L193">			setBankAccountBalance(getBankAccountBalance() - paymentAmount);</span>
+		} else {
+<span class="fc" id="L195">			int liquidatedValue = liquidateTitlesToGenerateCash(paymentAmount);</span>
+<span class="fc" id="L196">			setBankAccountBalance((getBankAccountBalance() + liquidatedValue) - paymentAmount);</span>
+		}
+<span class="fc" id="L198">		return true;</span>
+	}
+
+	public String getName() {
+<span class="fc" id="L202">		return name;</span>
+	}
+
+	public Avatar getAvatar() {
+<span class="nc" id="L206">		return avatar;</span>
+	}
+	
+	public boolean wouldYouLikeToPurchase(PrivateBoardSpace&lt;? extends Title&gt; privateBoardSpace) {
+		// TODO. Add more sophistication here later.
+<span class="nc bnc" id="L211" title="All 2 branches missed.">		return privateBoardSpace.getPurchasePrice() &lt; getBankAccountBalance();</span>
+	}
+	
+	public void acceptOwnership(Title title) {
+<span class="fc bfc" id="L215" title="All 2 branches covered.">		if (title.isProperty()) {</span>
+<span class="fc" id="L216">			addOwnedProperty((TitleDeed) title);</span>
+<span class="fc bfc" id="L217" title="All 2 branches covered.">		} else if (title.isRailroad()) {</span>
+<span class="fc" id="L218">			getOwnedRailroads().add(title);</span>
+<span class="pc bpc" id="L219" title="1 of 2 branches missed.">		} else if (title.isUtility()) {</span>
+<span class="fc" id="L220">			getOwnedUtilities().add(title);</span>
+		}
+<span class="fc" id="L222">	}</span>
+
+	public Collection&lt;TitleDeed&gt; getOwnedProperties() {
+<span class="fc" id="L225">		return ownedProperties;</span>
+	}
+	
+	private void addOwnedProperty(TitleDeed property) {
+<span class="fc" id="L229">		ownedProperties.add(property);</span>
+<span class="fc" id="L230">		DeedRecorder.addDeed(property);</span>
+<span class="fc" id="L231">	}</span>
+	
+	private BuildingSummary getBuildingSummary(TitleDeed titleDeed) {
+<span class="fc" id="L234">		return DeedRecorder.getBuildingSummary(titleDeed);</span>
+	}
+	
+	public int getNumberHousesOnProperty(TitleDeed titleDeed) {
+<span class="fc" id="L238">		BuildingSummary propertyBuildingSummary = getBuildingSummary(titleDeed);</span>
+<span class="pc bpc" id="L239" title="1 of 2 branches missed.">		return (propertyBuildingSummary == null) ? 0 : propertyBuildingSummary.getNumberHouses();</span>
+	}
+	
+	public int getNumberHousesOnAllProperties() {
+<span class="nc" id="L243">		return getOwnedProperties().stream().mapToInt(titleDeed -&gt; getBuildingSummary(titleDeed).getNumberHouses()).sum();</span>
+	}
+	
+	public int getNumberHotelsOnProperty(TitleDeed titleDeed) {
+<span class="fc" id="L247">		BuildingSummary propertyBuildingSummary = getBuildingSummary(titleDeed);</span>
+<span class="pc bpc" id="L248" title="1 of 2 branches missed.">		return (propertyBuildingSummary == null) ? 0 : propertyBuildingSummary.getNumberHotels();</span>
+	}
+	
+	public int getNumberHotelsOnAllProperties() {
+<span class="nc" id="L252">		return getOwnedProperties().stream().mapToInt(titleDeed -&gt; getBuildingSummary(titleDeed).getNumberHotels()).sum();</span>
+	}
+	
+	public List&lt;Title&gt; getOwnedRailroads() {
+<span class="fc" id="L256">		return ownedRailroads;</span>
+	}
+	
+	public int getNumberOwnedRailroads() {
+<span class="nc" id="L260">		return getOwnedRailroads().size();</span>
+	}
+	
+	public List&lt;Title&gt; getOwnedUtilities() {
+<span class="fc" id="L264">		return ownedUtilities;</span>
+	}
+	
+	public int getNumberOwnedUtilities() {
+<span class="nc" id="L268">		return getOwnedUtilities().size();</span>
+	}
+	
+	public Set&lt;MonopolyDefinition&gt; getMonopolizedProperties() {
+<span class="nc" id="L272">		return getOwnedProperties().stream().filter(td -&gt; td.isPartOfMonopoly()).map(td -&gt; td.getMonopolyDefinition()).collect(Collectors.toSet());</span>
+	}
+	
+	public Optional&lt;TitleDeed&gt; findOwnedPropertyToImprove(Set&lt;MonopolyDefinition&gt; monopolizedProperties) {
+<span class="nc bnc" id="L276" title="All 2 branches missed.">		Optional&lt;TitleDeed&gt; titleDeedToImprove = monopolizedProperties.stream().filter(ownedMonopoly -&gt; ownedMonopoly.findLeastImprovedTitleDeed() != null)</span>
+<span class="nc" id="L277">				                                                               .findFirst()</span>
+<span class="nc" id="L278">				                                                               .map(ownedMonopoly -&gt; ownedMonopoly.findLeastImprovedTitleDeed());</span>
+		
+		// TODO : Configurable purchase policy here.
+		// For now, only choose to improve upon a property if the property can be improved upon and if the improvement
+		// cost is less than a certain percentage of the Player's cash on hand.
+<span class="nc bnc" id="L283" title="All 2 branches missed.">		if (titleDeedToImprove.isPresent()) {</span>
+<span class="nc" id="L284">		    TitleDeed titleDeed = titleDeedToImprove.get();</span>
+<span class="nc" id="L285">			BuildingSummary buildingSummary = DeedRecorder.getBuildingSummary(titleDeed);</span>
+<span class="nc bnc" id="L286" title="All 2 branches missed.">			if (buildingSummary.canImprove() &amp;&amp;</span>
+<span class="nc bnc" id="L287" title="All 2 branches missed.">				(((double) titleDeedToImprove.get().getPlayerBuildingPurchasePrice()) &lt;= this.getBankAccountBalance() * 0.25d)) {</span>
+<span class="nc" id="L288">				return titleDeedToImprove;</span>
+			}
+		}
+<span class="nc" id="L291">		return Optional.empty(); // Choose to not build another house.</span>
+	}
+	
+	public boolean isInJail() {
+<span class="nc" id="L295">		return inJail;</span>
+	}
+
+	public void setInJail(boolean newValue) {
+<span class="nc" id="L299">		inJail = newValue;</span>
+<span class="nc bnc" id="L300" title="All 2 branches missed.">		if (newValue == false) {</span>
+<span class="nc" id="L301">			numFailedAttemptsToGetOutOfJail = 0;</span>
+		}
+<span class="nc" id="L303">	}</span>
+
+	public int getNumFailedAttemptsToGetOutOfJail() {
+<span class="nc" id="L306">		return numFailedAttemptsToGetOutOfJail;</span>
+	}
+
+	public void incrementNumFailedAttemptsToGetOutOfJail() {
+<span class="nc" id="L310">		numFailedAttemptsToGetOutOfJail++;</span>
+<span class="nc" id="L311">	}</span>
+
+	public boolean isHoldingGetOutOfJailFreeCard() {
+<span class="nc" id="L314">		return holdingGetOutOfJailFreeCard;</span>
+	}
+
+	public void setHoldingGetOutOfJailFreeCard(boolean newValue) {
+<span class="nc" id="L318">		holdingGetOutOfJailFreeCard = newValue;</span>
+<span class="nc" id="L319">	}</span>
+	
+	public int computeLiquidationValue(Title title) {
+<span class="fc bfc" id="L322" title="All 2 branches covered.">		if (title.isTitleDeed()) {</span>
+<span class="fc" id="L323">			TitleDeed titleDeed = (TitleDeed) title;</span>
+<span class="fc" id="L324">			return titleDeed.getMortgageValue() + titleDeed.computeBuildingsLiquidationValue(getNumberHousesOnProperty(titleDeed), getNumberHotelsOnProperty(titleDeed));</span>
+		} else {
+			// Its a railroad or utility
+<span class="fc bfc" id="L327" title="All 2 branches covered.">			Optional&lt;Title&gt; foundRailroadTitle = getOwnedRailroads().stream().filter(railroadTitle -&gt; railroadTitle == title).findFirst();</span>
+<span class="fc bfc" id="L328" title="All 2 branches covered.">			if (foundRailroadTitle.isPresent()) {</span>
+<span class="fc" id="L329">				return foundRailroadTitle.get().getMortgageValue();</span>
+			}
+			
+<span class="pc bpc" id="L332" title="1 of 2 branches missed.">			Optional&lt;Title&gt; foundUtilityTitle = getOwnedUtilities().stream().filter(utilityTitle -&gt; utilityTitle == title).findFirst();</span>
+<span class="pc bpc" id="L333" title="1 of 2 branches missed.">			if (foundUtilityTitle.isPresent()) {</span>
+<span class="fc" id="L334">				return foundUtilityTitle.get().getMortgageValue();</span>
+			}
+		}
+		
+		// Should never get here
+<span class="nc" id="L339">		return 0;</span>
+	}
+	
+	/**
+	 * Transfers all assets from this Player to the recipient. This method
+	 * only called when this Player has been bankrupted.
+	 * @param recipient Can be null to indicate the new owner is actually
+	 * the Bank again.
+	 */
+	public void transferAssetsToPlayerDueToDefaultingOnPaymentDue(Player recipient) {
+<span class="nc" id="L349">		this.getOwnedProperties().stream().forEach(titleDeed -&gt; titleDeed.setOwner(recipient));</span>
+<span class="nc" id="L350">		this.getOwnedRailroads().stream().forEach(railroadTitle -&gt; railroadTitle.setOwner(recipient));</span>
+<span class="nc" id="L351">		this.getOwnedUtilities().stream().forEach(utilityTitle -&gt; utilityTitle.setOwner(recipient));</span>
+		
+<span class="nc bnc" id="L353" title="All 2 branches missed.">		if (recipient != null) {</span>
+			// Allow the acquiring Player to make decisions about &quot;lifting&quot; the
+			// mortgage on any newly acquired mortgaged properties.
+<span class="nc" id="L356">			recipient.receivePayment(this.getBankAccountBalance());</span>
+		}
+		
+		// TODO : Allow receiving Player the opportunity to immediately
+		// lift the mortgage on any mortgaged Titles just acquired.
+<span class="nc" id="L361">		setBankrupt();</span>
+<span class="nc" id="L362">	}</span>
+
+	public boolean isBankrupt() {
+<span class="nc" id="L365">		return bankrupt;</span>
+	}
+	
+	private void setBankrupt() {
+		// A Player cannot recover from bankruptcy, so when this method is called
+		// the Player is bankrupt and no longer active in the game.
+<span class="nc" id="L371">		ownedProperties.forEach(titleDeed -&gt; titleDeed.reset());</span>
+<span class="nc" id="L372">		ownedProperties.clear();</span>
+<span class="nc" id="L373">		ownedRailroads.forEach(titleDeed -&gt; titleDeed.reset());</span>
+<span class="nc" id="L374">		ownedRailroads.clear();</span>
+<span class="nc" id="L375">		ownedUtilities.forEach(titleDeed -&gt; titleDeed.reset());</span>
+<span class="nc" id="L376">		ownedUtilities.clear();</span>
+<span class="nc" id="L377">		setBankAccountBalance(0);</span>
+<span class="nc" id="L378">		bankrupt = true;</span>
+<span class="nc" id="L379">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

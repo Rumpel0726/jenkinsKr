@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WordTree.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">games</a> &gt; <a href="index.source.html" class="el_package">org.douggschwind.games.dicegames.boggle</a> &gt; <span class="el_source">WordTree.java</span></div><h1>WordTree.java</h1><pre class="source lang-java linenums">package org.douggschwind.games.dicegames.boggle;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+/**
+ * Houses an n-ary tree that decomposes our list of valid words into a sequence of nodes for ease
+ * in determining if a sequence of letters is a word or the first letters of one to many valid words.
+ * @author Doug Gschwind
+ */
+<span class="fc" id="L13">public class WordTree {</span>
+<span class="fc" id="L14">    private final Map&lt;Character, LetterNode&gt; rootLetterMap = new HashMap&lt;&gt;();</span>
+
+    // Retain the set of validWords to make the isValidWord() implementation very simple.
+    private Set&lt;String&gt; validWords;
+
+    private void seed(String validWord) {
+<span class="fc" id="L20">        LetterNode previousLetterNode = null;</span>
+<span class="fc bfc" id="L21" title="All 2 branches covered.">        for (int letterIndex = 0;letterIndex &lt; validWord.length();letterIndex++) {</span>
+<span class="fc" id="L22">            char currentLetter = validWord.charAt(letterIndex);</span>
+<span class="fc bfc" id="L23" title="All 2 branches covered.">            if (letterIndex == 0) {</span>
+<span class="fc" id="L24">                previousLetterNode = rootLetterMap.get(currentLetter);</span>
+<span class="fc bfc" id="L25" title="All 2 branches covered.">                if (previousLetterNode == null) {</span>
+<span class="fc" id="L26">                    previousLetterNode = new LetterNode(currentLetter);</span>
+<span class="fc" id="L27">                    rootLetterMap.put(currentLetter, previousLetterNode);</span>
+                }
+            } else {
+<span class="fc" id="L30">                previousLetterNode = previousLetterNode.addChildNode(currentLetter);</span>
+            }
+        }
+<span class="fc" id="L33">        previousLetterNode.setWord(true);</span>
+<span class="fc" id="L34">    }</span>
+
+    /**
+     * Populates with all of the words known to be valid.
+     * @param validWords
+     */
+    public void seed(Set&lt;String&gt; validWords) {
+<span class="fc" id="L41">        validWords.forEach(word -&gt; seed(word));</span>
+<span class="fc" id="L42">        this.validWords = validWords;</span>
+<span class="fc" id="L43">    }</span>
+
+    /**
+     * Determines if this instance has one or more words that begin with the given prefix.
+     * @param prefix Expected to be non-empty and non-null.
+     * @return
+     */
+    public boolean hasWordsThatBeginWith(String prefix) {
+<span class="pc bpc" id="L51" title="2 of 4 branches missed.">        if ((prefix == null) || (prefix.isEmpty())) {</span>
+<span class="nc" id="L52">            return false;</span>
+        }
+
+<span class="fc" id="L55">        LetterNode previousLetterNode = null;</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">        for (int letterIndex = 0;letterIndex &lt; prefix.length();letterIndex++) {</span>
+<span class="fc" id="L57">            char currentLetter = prefix.charAt(letterIndex);</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">            if (letterIndex == 0) {</span>
+<span class="fc" id="L59">                previousLetterNode = rootLetterMap.get(currentLetter);</span>
+<span class="fc bfc" id="L60" title="All 2 branches covered.">                if (previousLetterNode == null) {</span>
+                    // Can only get here if our list of valid words doesn't have coverage for at least one
+                    // word that begins with each different letter of the alphabet.
+<span class="fc" id="L63">                    return false;</span>
+                }
+            } else {
+<span class="fc" id="L66">                Optional&lt;LetterNode&gt; previousLetterNodeOptional = previousLetterNode.getChildNode(currentLetter);</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">                if (!previousLetterNodeOptional.isPresent()) {</span>
+<span class="fc" id="L68">                    return false;</span>
+                }
+<span class="fc" id="L70">                previousLetterNode = previousLetterNodeOptional.get();</span>
+            }
+        }
+
+<span class="fc" id="L74">        return true;</span>
+    }
+
+    public boolean isValidWord(String input) {
+<span class="fc" id="L78">        return validWords.contains(input);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

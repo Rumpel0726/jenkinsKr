@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ChessMove.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">games</a> &gt; <a href="index.source.html" class="el_package">org.douggschwind.games.chess.moves</a> &gt; <span class="el_source">ChessMove.java</span></div><h1>ChessMove.java</h1><pre class="source lang-java linenums">package org.douggschwind.games.chess.moves;
+
+import org.douggschwind.games.chess.ChessBoard;
+import org.douggschwind.games.chess.Player;
+
+/**
+ * The general abstraction that represents a single move in Chess by a Player.
+ * @author Doug Gschwind
+ */
+public interface ChessMove {
+    default boolean isCommonMove() {
+<span class="nc" id="L12">        return false;</span>
+    }
+
+    default boolean isCastlingMove() {
+<span class="nc" id="L16">        return false;</span>
+    }
+
+    /**
+     * Determines if this move by the given attempting player is permitted or not.
+     * @param player Must be non-null.
+     * @param chessBoard Must be non-null.
+     * @return true if the given Player is in fact permitted to make this move, false otherwise.
+     */
+    boolean isPermitted(Player player, ChessBoard chessBoard);
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

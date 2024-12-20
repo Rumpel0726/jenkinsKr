@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UtilityBoardSpace.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">games</a> &gt; <a href="index.source.html" class="el_package">org.douggschwind.games.boardgames.monopoly.space</a> &gt; <span class="el_source">UtilityBoardSpace.java</span></div><h1>UtilityBoardSpace.java</h1><pre class="source lang-java linenums">package org.douggschwind.games.boardgames.monopoly.space;
+
+import org.douggschwind.games.boardgames.monopoly.title.Title;
+
+/**
+ * An instance of this class represents one of the two Utilities available in the game.
+ * @author Doug Gschwind
+ */
+public class UtilityBoardSpace extends PrivateBoardSpace&lt;Title&gt; {
+
+	public UtilityBoardSpace(Title title) {
+<span class="nc" id="L12">		super(title);</span>
+<span class="nc" id="L13">	}</span>
+	
+	@Override
+	public final boolean isUtility() {
+<span class="nc" id="L17">		return true;</span>
+	}
+	
+	public int computeRent(int numberOfUtilitiesOwned, int valueOfDiceRoll) {
+<span class="nc" id="L21">		int multiplier = 0;</span>
+<span class="nc bnc" id="L22" title="All 2 branches missed.">		if (numberOfUtilitiesOwned == 2) {</span>
+<span class="nc" id="L23">			multiplier = 10;</span>
+<span class="nc bnc" id="L24" title="All 2 branches missed.">		} else if (numberOfUtilitiesOwned == 1) {</span>
+<span class="nc" id="L25">			multiplier = 4;</span>
+		}
+<span class="nc" id="L27">		return multiplier * valueOfDiceRoll;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

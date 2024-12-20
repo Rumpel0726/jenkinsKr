@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Boggle4x4Dice.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">games</a> &gt; <a href="index.source.html" class="el_package">org.douggschwind.games.dicegames.boggle</a> &gt; <span class="el_source">Boggle4x4Dice.java</span></div><h1>Boggle4x4Dice.java</h1><pre class="source lang-java linenums">package org.douggschwind.games.dicegames.boggle;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * This is the dice configuration for the English Boggle 16 dice version:
+ * Die0: R, I, F, O, B, X
+ * Die1: I, F, E, H, E, Y
+ * Die2: D, E, N, O, W, S
+ * Die3: U, T, O, K, N, D
+ * Die4: H, M, S, R, A, O
+ * Die5: L, U, P, E, T, S
+ * Die6: A, C, I, T, O, A
+ * Die7: Y, L, G, K, U, E
+ * Die8: Qu, B, M, J, O, A
+ * Die9: E, H, I, S, P, N
+ * Die10: V, E, T, I, G, N
+ * Die11: B, A, L, I, Y, T
+ * Die12: E, Z, A, V, N, D
+ * Die13: R, A, L, E, S, C
+ * Die14: U, W, I, L, R, G
+ * Die15: P, A, C, E, M, D
+ * @author Doug Gschwind
+ */
+<span class="nc" id="L26">public class Boggle4x4Dice extends BoggleDice {</span>
+    private static final int SIZE = 4;
+
+<span class="nc" id="L29">    private static final List&lt;DieLetter&gt; DIE0 = new ArrayList();</span>
+<span class="nc" id="L30">    private static final List&lt;DieLetter&gt; DIE1 = new ArrayList();</span>
+<span class="nc" id="L31">    private static final List&lt;DieLetter&gt; DIE2 = new ArrayList();</span>
+<span class="nc" id="L32">    private static final List&lt;DieLetter&gt; DIE3 = new ArrayList();</span>
+<span class="nc" id="L33">    private static final List&lt;DieLetter&gt; DIE4 = new ArrayList();</span>
+<span class="nc" id="L34">    private static final List&lt;DieLetter&gt; DIE5 = new ArrayList();</span>
+<span class="nc" id="L35">    private static final List&lt;DieLetter&gt; DIE6 = new ArrayList();</span>
+<span class="nc" id="L36">    private static final List&lt;DieLetter&gt; DIE7 = new ArrayList();</span>
+<span class="nc" id="L37">    private static final List&lt;DieLetter&gt; DIE8 = new ArrayList();</span>
+<span class="nc" id="L38">    private static final List&lt;DieLetter&gt; DIE9 = new ArrayList();</span>
+<span class="nc" id="L39">    private static final List&lt;DieLetter&gt; DIE10 = new ArrayList();</span>
+<span class="nc" id="L40">    private static final List&lt;DieLetter&gt; DIE11 = new ArrayList();</span>
+<span class="nc" id="L41">    private static final List&lt;DieLetter&gt; DIE12 = new ArrayList();</span>
+<span class="nc" id="L42">    private static final List&lt;DieLetter&gt; DIE13 = new ArrayList();</span>
+<span class="nc" id="L43">    private static final List&lt;DieLetter&gt; DIE14 = new ArrayList();</span>
+<span class="nc" id="L44">    private static final List&lt;DieLetter&gt; DIE15 = new ArrayList();</span>
+
+<span class="nc" id="L46">    private static final List&lt;DieLetter&gt;[] DICE = (List&lt;DieLetter&gt;[]) new List[SIZE * SIZE];</span>
+
+    static {
+<span class="nc" id="L49">        DIE0.add(new DieLetter('r'));</span>
+<span class="nc" id="L50">        DIE0.add(new DieLetter('i'));</span>
+<span class="nc" id="L51">        DIE0.add(new DieLetter('f'));</span>
+<span class="nc" id="L52">        DIE0.add(new DieLetter('o'));</span>
+<span class="nc" id="L53">        DIE0.add(new DieLetter('b'));</span>
+<span class="nc" id="L54">        DIE0.add(new DieLetter('x'));</span>
+
+<span class="nc" id="L56">        DIE1.add(new DieLetter('i'));</span>
+<span class="nc" id="L57">        DIE1.add(new DieLetter('f'));</span>
+<span class="nc" id="L58">        DIE1.add(new DieLetter('e'));</span>
+<span class="nc" id="L59">        DIE1.add(new DieLetter('h'));</span>
+<span class="nc" id="L60">        DIE1.add(new DieLetter('e'));</span>
+<span class="nc" id="L61">        DIE1.add(new DieLetter('y'));</span>
+
+<span class="nc" id="L63">        DIE2.add(new DieLetter('d'));</span>
+<span class="nc" id="L64">        DIE2.add(new DieLetter('e'));</span>
+<span class="nc" id="L65">        DIE2.add(new DieLetter('n'));</span>
+<span class="nc" id="L66">        DIE2.add(new DieLetter('o'));</span>
+<span class="nc" id="L67">        DIE2.add(new DieLetter('w'));</span>
+<span class="nc" id="L68">        DIE2.add(new DieLetter('s'));</span>
+
+<span class="nc" id="L70">        DIE3.add(new DieLetter('u'));</span>
+<span class="nc" id="L71">        DIE3.add(new DieLetter('t'));</span>
+<span class="nc" id="L72">        DIE3.add(new DieLetter('o'));</span>
+<span class="nc" id="L73">        DIE3.add(new DieLetter('k'));</span>
+<span class="nc" id="L74">        DIE3.add(new DieLetter('n'));</span>
+<span class="nc" id="L75">        DIE3.add(new DieLetter('d'));</span>
+
+<span class="nc" id="L77">        DIE4.add(new DieLetter('h'));</span>
+<span class="nc" id="L78">        DIE4.add(new DieLetter('m'));</span>
+<span class="nc" id="L79">        DIE4.add(new DieLetter('s'));</span>
+<span class="nc" id="L80">        DIE4.add(new DieLetter('r'));</span>
+<span class="nc" id="L81">        DIE4.add(new DieLetter('a'));</span>
+<span class="nc" id="L82">        DIE4.add(new DieLetter('o'));</span>
+
+<span class="nc" id="L84">        DIE5.add(new DieLetter('l'));</span>
+<span class="nc" id="L85">        DIE5.add(new DieLetter('u'));</span>
+<span class="nc" id="L86">        DIE5.add(new DieLetter('p'));</span>
+<span class="nc" id="L87">        DIE5.add(new DieLetter('e'));</span>
+<span class="nc" id="L88">        DIE5.add(new DieLetter('t'));</span>
+<span class="nc" id="L89">        DIE5.add(new DieLetter('s'));</span>
+
+<span class="nc" id="L91">        DIE6.add(new DieLetter('a'));</span>
+<span class="nc" id="L92">        DIE6.add(new DieLetter('c'));</span>
+<span class="nc" id="L93">        DIE6.add(new DieLetter('i'));</span>
+<span class="nc" id="L94">        DIE6.add(new DieLetter('t'));</span>
+<span class="nc" id="L95">        DIE6.add(new DieLetter('o'));</span>
+<span class="nc" id="L96">        DIE6.add(new DieLetter('a'));</span>
+
+<span class="nc" id="L98">        DIE7.add(new DieLetter('y'));</span>
+<span class="nc" id="L99">        DIE7.add(new DieLetter('l'));</span>
+<span class="nc" id="L100">        DIE7.add(new DieLetter('g'));</span>
+<span class="nc" id="L101">        DIE7.add(new DieLetter('k'));</span>
+<span class="nc" id="L102">        DIE7.add(new DieLetter('u'));</span>
+<span class="nc" id="L103">        DIE7.add(new DieLetter('e'));</span>
+
+<span class="nc" id="L105">        DIE8.add(new DieLetter('q', true));</span>
+<span class="nc" id="L106">        DIE8.add(new DieLetter('b'));</span>
+<span class="nc" id="L107">        DIE8.add(new DieLetter('m'));</span>
+<span class="nc" id="L108">        DIE8.add(new DieLetter('j'));</span>
+<span class="nc" id="L109">        DIE8.add(new DieLetter('o'));</span>
+<span class="nc" id="L110">        DIE8.add(new DieLetter('a'));</span>
+
+<span class="nc" id="L112">        DIE9.add(new DieLetter('e'));</span>
+<span class="nc" id="L113">        DIE9.add(new DieLetter('h'));</span>
+<span class="nc" id="L114">        DIE9.add(new DieLetter('i'));</span>
+<span class="nc" id="L115">        DIE9.add(new DieLetter('s'));</span>
+<span class="nc" id="L116">        DIE9.add(new DieLetter('p'));</span>
+<span class="nc" id="L117">        DIE9.add(new DieLetter('n'));</span>
+
+<span class="nc" id="L119">        DIE10.add(new DieLetter('v'));</span>
+<span class="nc" id="L120">        DIE10.add(new DieLetter('e'));</span>
+<span class="nc" id="L121">        DIE10.add(new DieLetter('t'));</span>
+<span class="nc" id="L122">        DIE10.add(new DieLetter('i'));</span>
+<span class="nc" id="L123">        DIE10.add(new DieLetter('g'));</span>
+<span class="nc" id="L124">        DIE10.add(new DieLetter('n'));</span>
+
+<span class="nc" id="L126">        DIE11.add(new DieLetter('b'));</span>
+<span class="nc" id="L127">        DIE11.add(new DieLetter('a'));</span>
+<span class="nc" id="L128">        DIE11.add(new DieLetter('l'));</span>
+<span class="nc" id="L129">        DIE11.add(new DieLetter('i'));</span>
+<span class="nc" id="L130">        DIE11.add(new DieLetter('y'));</span>
+<span class="nc" id="L131">        DIE11.add(new DieLetter('t'));</span>
+
+<span class="nc" id="L133">        DIE12.add(new DieLetter('e'));</span>
+<span class="nc" id="L134">        DIE12.add(new DieLetter('z'));</span>
+<span class="nc" id="L135">        DIE12.add(new DieLetter('a'));</span>
+<span class="nc" id="L136">        DIE12.add(new DieLetter('v'));</span>
+<span class="nc" id="L137">        DIE12.add(new DieLetter('n'));</span>
+<span class="nc" id="L138">        DIE12.add(new DieLetter('d'));</span>
+
+<span class="nc" id="L140">        DIE13.add(new DieLetter('r'));</span>
+<span class="nc" id="L141">        DIE13.add(new DieLetter('a'));</span>
+<span class="nc" id="L142">        DIE13.add(new DieLetter('l'));</span>
+<span class="nc" id="L143">        DIE13.add(new DieLetter('e'));</span>
+<span class="nc" id="L144">        DIE13.add(new DieLetter('s'));</span>
+<span class="nc" id="L145">        DIE13.add(new DieLetter('c'));</span>
+
+<span class="nc" id="L147">        DIE14.add(new DieLetter('u'));</span>
+<span class="nc" id="L148">        DIE14.add(new DieLetter('w'));</span>
+<span class="nc" id="L149">        DIE14.add(new DieLetter('i'));</span>
+<span class="nc" id="L150">        DIE14.add(new DieLetter('l'));</span>
+<span class="nc" id="L151">        DIE14.add(new DieLetter('r'));</span>
+<span class="nc" id="L152">        DIE14.add(new DieLetter('g'));</span>
+
+<span class="nc" id="L154">        DIE15.add(new DieLetter('p'));</span>
+<span class="nc" id="L155">        DIE15.add(new DieLetter('a'));</span>
+<span class="nc" id="L156">        DIE15.add(new DieLetter('c'));</span>
+<span class="nc" id="L157">        DIE15.add(new DieLetter('e'));</span>
+<span class="nc" id="L158">        DIE15.add(new DieLetter('m'));</span>
+<span class="nc" id="L159">        DIE15.add(new DieLetter('d'));</span>
+
+<span class="nc" id="L161">        DICE[0] = DIE0;</span>
+<span class="nc" id="L162">        DICE[1] = DIE1;</span>
+<span class="nc" id="L163">        DICE[2] = DIE2;</span>
+<span class="nc" id="L164">        DICE[3] = DIE3;</span>
+<span class="nc" id="L165">        DICE[4] = DIE4;</span>
+<span class="nc" id="L166">        DICE[5] = DIE5;</span>
+<span class="nc" id="L167">        DICE[6] = DIE6;</span>
+<span class="nc" id="L168">        DICE[7] = DIE7;</span>
+<span class="nc" id="L169">        DICE[8] = DIE8;</span>
+<span class="nc" id="L170">        DICE[9] = DIE9;</span>
+<span class="nc" id="L171">        DICE[10] = DIE10;</span>
+<span class="nc" id="L172">        DICE[11] = DIE11;</span>
+<span class="nc" id="L173">        DICE[12] = DIE12;</span>
+<span class="nc" id="L174">        DICE[13] = DIE13;</span>
+<span class="nc" id="L175">        DICE[14] = DIE14;</span>
+<span class="nc" id="L176">        DICE[15] = DIE15;</span>
+<span class="nc" id="L177">    }</span>
+
+    @Override
+    public final int size() {
+<span class="nc" id="L181">        return SIZE;</span>
+    }
+
+    @Override
+    public final List&lt;DieLetter&gt;[] getSupportedDice() {
+<span class="nc" id="L186">        return DICE;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

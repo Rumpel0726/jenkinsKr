@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ChessPiece.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">games</a> &gt; <a href="index.source.html" class="el_package">org.douggschwind.games.chess.piece</a> &gt; <span class="el_source">ChessPiece.java</span></div><h1>ChessPiece.java</h1><pre class="source lang-java linenums">package org.douggschwind.games.chess.piece;
+
+import org.douggschwind.games.chess.BoardPosition;
+import org.douggschwind.games.chess.ChessBoard;
+import org.douggschwind.games.chess.moves.CommonMove;
+import org.douggschwind.games.chess.Player;
+import org.douggschwind.games.chess.Square;
+
+/**
+ * Represents the abstraction of which all pieces in a game of Chess are.
+ * @author Doug Gschwind
+ */
+public abstract class ChessPiece {
+    private final Player owner;
+    private BoardPosition initialPosition;
+    private int numTimesMoved;
+    private boolean captured;
+
+<span class="fc" id="L19">    protected ChessPiece(Player owner) {</span>
+<span class="fc" id="L20">        this.owner = owner;</span>
+<span class="fc" id="L21">    }</span>
+
+    public Player getOwner() {
+<span class="fc" id="L24">        return owner;</span>
+    }
+
+    public boolean isOpponent(ChessPiece that) {
+<span class="fc bfc" id="L28" title="All 2 branches covered.">        return this.owner != that.owner;</span>
+    }
+
+    protected BoardPosition getInitialPosition() {
+<span class="fc" id="L32">        return initialPosition;</span>
+    }
+
+    public void setInitialPosition(BoardPosition initialPosition) {
+<span class="fc" id="L36">        this.initialPosition = initialPosition;</span>
+<span class="fc" id="L37">    }</span>
+
+    public boolean isPawn() {
+<span class="fc" id="L40">        return false;</span>
+    }
+
+    public boolean isRook() {
+<span class="fc" id="L44">        return false;</span>
+    }
+
+    public boolean isKnight() {
+<span class="fc" id="L48">        return false;</span>
+    }
+
+    public boolean isBishop() {
+<span class="fc" id="L52">        return false;</span>
+    }
+
+    public boolean isQueen() {
+<span class="fc" id="L56">        return false;</span>
+    }
+
+    public boolean isKing() {
+<span class="nc" id="L60">        return false;</span>
+    }
+
+    protected final boolean isKnightMovement(CommonMove proposedMove) {
+<span class="fc" id="L64">        final int numRowsMovement = proposedMove.getAbsNumRowsMovement();</span>
+<span class="fc" id="L65">        final int numColumnsMovement = proposedMove.getAbsNumColumnsMovement();</span>
+
+<span class="pc bpc" id="L67" title="3 of 8 branches missed.">        return (((numRowsMovement == 2) &amp;&amp; (numColumnsMovement == 1)) ||</span>
+                ((numRowsMovement == 1) &amp;&amp; (numColumnsMovement == 2)));
+    }
+
+    protected int getNumTimesMoved() {
+<span class="fc" id="L72">        return numTimesMoved;</span>
+    }
+
+    public boolean hasEverBeenMoved() {
+<span class="fc bfc" id="L76" title="All 2 branches covered.">        return getNumTimesMoved() &gt; 0;</span>
+    }
+
+    /**
+     * Determines if the given player can move the ChessPiece located in the from Square.
+     * @param player Must be non-null.
+     * @param from Must be non-null.
+     * @return
+     */
+    public final boolean canMoveFrom(Player player, Square from) {
+<span class="pc bpc" id="L86" title="1 of 4 branches missed.">        return from.isOccupied() &amp;&amp; (player == from.getResident().get().getOwner());</span>
+    }
+
+    /**
+     * Determines if the given piece can be moved from its current square to a target destination square.
+     * @param chessBoard Must be non-null.
+     * @param proposedMove Must be non-null and properly populated.
+     * @return true if so, false if the piece is not allowed to be moved to the destination.
+     */
+    public abstract boolean canMoveTo(ChessBoard chessBoard, CommonMove proposedMove);
+
+    protected final void basicMove(CommonMove move) {
+<span class="fc" id="L98">        final Square from = move.getFrom();</span>
+<span class="fc" id="L99">        final Square to = move.getTo();</span>
+
+<span class="fc" id="L101">        boolean isCapturing = to.isOccupied();</span>
+<span class="pc bpc" id="L102" title="1 of 2 branches missed.">        if (isCapturing) {</span>
+<span class="nc" id="L103">            to.getResident().get().markCaptured();</span>
+        }
+<span class="fc" id="L105">        to.setResident(from.getResident().get());</span>
+<span class="fc" id="L106">        from.empty();</span>
+<span class="fc" id="L107">    }</span>
+
+    // Concrete subclasses must implement.
+    protected abstract void handleMoveTo(ChessBoard chessBoard, CommonMove move);
+    /**
+     * Demands that the ChessPiece in the from Square be moved to the to Square.
+     * @param chessBoard Must be non-null.
+     * @param move Must be non-null and properly populated.
+     */
+    public final void moveTo(ChessBoard chessBoard, CommonMove move) {
+<span class="fc" id="L117">        handleMoveTo(chessBoard, move);</span>
+<span class="fc" id="L118">        numTimesMoved++;</span>
+<span class="fc" id="L119">    }</span>
+
+    public boolean hasBeenCaptured() {
+<span class="fc" id="L122">        return captured;</span>
+    }
+
+    public void markCaptured() {
+<span class="fc" id="L126">        captured = true;</span>
+<span class="fc" id="L127">    }</span>
+
+    public String getPrintAbbreviation() {
+<span class="fc bfc" id="L130" title="All 2 branches covered.">        if (isPawn()) {</span>
+<span class="fc" id="L131">            return &quot;p&quot;;</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">        } else if (isRook()) {</span>
+<span class="fc" id="L133">            return &quot;r&quot;;</span>
+<span class="fc bfc" id="L134" title="All 2 branches covered.">        } else if (isKnight()) {</span>
+<span class="fc" id="L135">            return &quot;k&quot;;</span>
+<span class="fc bfc" id="L136" title="All 2 branches covered.">        } else if (isBishop()) {</span>
+<span class="fc" id="L137">            return &quot;b&quot;;</span>
+<span class="fc bfc" id="L138" title="All 2 branches covered.">        } else if (isQueen()) {</span>
+<span class="fc" id="L139">            return &quot;Q&quot;;</span>
+        } else {
+<span class="fc" id="L141">            return &quot;K&quot;;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TypeOfStraightThatCanBeFormed.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">games</a> &gt; <a href="index.source.html" class="el_package">org.douggschwind.games.cardgames.wildcardpoker</a> &gt; <span class="el_source">TypeOfStraightThatCanBeFormed.java</span></div><h1>TypeOfStraightThatCanBeFormed.java</h1><pre class="source lang-java linenums">package org.douggschwind.games.cardgames.wildcardpoker;
+
+import org.douggschwind.games.cardgames.common.FrenchSuitedPlayingCard;
+
+/**
+ * @author Doug Gschwind
+ */
+public class TypeOfStraightThatCanBeFormed {
+	
+<span class="fc" id="L10">	public static enum StraightType {</span>
+<span class="fc" id="L11">		ACE_HIGH_STRAIGHT,</span>
+<span class="fc" id="L12">		ACE_LOW_STRAIGHT,</span>
+<span class="fc" id="L13">		STRAIGHT,</span>
+<span class="fc" id="L14">		NONE;</span>
+		
+		public boolean isAceHighStraight() {
+<span class="fc bfc" id="L17" title="All 2 branches covered.">			return (this == ACE_HIGH_STRAIGHT);</span>
+		}
+		
+		public boolean isAceLowStraight() {
+<span class="fc bfc" id="L21" title="All 2 branches covered.">			return (this == ACE_LOW_STRAIGHT);</span>
+		}
+		
+		public boolean isStraight() {
+<span class="fc bfc" id="L25" title="All 2 branches covered.">			return (this == STRAIGHT);</span>
+		}
+		
+		public boolean isNone() {
+<span class="nc bnc" id="L29" title="All 2 branches missed.">			return (this == NONE);</span>
+		}
+	}
+	
+	private final StraightType straightType;
+	private final FrenchSuitedPlayingCard.Kind highCardKind;
+
+<span class="fc" id="L36">	public TypeOfStraightThatCanBeFormed(StraightType straightType, FrenchSuitedPlayingCard.Kind highCardKind) {</span>
+<span class="fc" id="L37">		this.straightType = straightType;</span>
+<span class="fc" id="L38">		this.highCardKind = highCardKind;</span>
+<span class="fc" id="L39">	}</span>
+	
+	public boolean isAceHighStraight() {
+<span class="fc" id="L42">		return getStraightType().isAceHighStraight();</span>
+	}
+	
+	public boolean isAceLowStraight() {
+<span class="fc" id="L46">		return getStraightType().isAceLowStraight();</span>
+	}
+	
+	public boolean isStraight() {
+<span class="fc" id="L50">		return getStraightType().isStraight();</span>
+	}
+	
+	public boolean isNone() {
+<span class="nc" id="L54">		return getStraightType().isNone();</span>
+	}
+
+	public StraightType getStraightType() {
+<span class="fc" id="L58">		return straightType;</span>
+	}
+
+	public FrenchSuitedPlayingCard.Kind getHighCardKind() {
+<span class="fc" id="L62">		return highCardKind;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

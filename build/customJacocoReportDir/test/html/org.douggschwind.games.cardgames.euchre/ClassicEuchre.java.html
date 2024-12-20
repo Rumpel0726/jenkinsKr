@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ClassicEuchre.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">games</a> &gt; <a href="index.source.html" class="el_package">org.douggschwind.games.cardgames.euchre</a> &gt; <span class="el_source">ClassicEuchre.java</span></div><h1>ClassicEuchre.java</h1><pre class="source lang-java linenums">package org.douggschwind.games.cardgames.euchre;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.douggschwind.games.cardgames.common.FrenchSuitedPlayingCard;
+import org.douggschwind.games.cardgames.common.DeckFactory;
+import org.douggschwind.games.cardgames.common.Player;
+import org.douggschwind.games.cardgames.common.StandardDeckCardGame;
+import org.douggschwind.games.cardgames.poker.common.HandStrength;
+
+/**
+ * Classic Euchre is where there are exactly four players, each are dealt
+ * five cards, and the deck used consists of a subset of a standard deck
+ * of cards where the 9s and higher (10s, Jacks, etc.) are present in the
+ * deck. Besides the 20 cards dealt to the players, the dealer is left with
+ * four extra cards after dealing 5 to each player. The topmost of those
+ * four cards is turned over to begin attempting to determine trump for
+ * the given hand.
+ * 
+ * There are variants of Euchre that allow different numbers of players
+ * such as two, three, or even six (Shoot the Moon) players. The variant
+ * supported by this class is expressly for the case where there are
+ * exactly four players.
+ * 
+ * @author Doug Gschwind
+ */
+public class ClassicEuchre extends StandardDeckCardGame {
+	
+<span class="fc" id="L30">	private List&lt;FrenchSuitedPlayingCard&gt; kitty = new ArrayList&lt;&gt;(4);</span>
+
+	public ClassicEuchre() {
+<span class="fc" id="L33">		super(DeckFactory.createEuchreDeck());</span>
+<span class="fc" id="L34">	}</span>
+
+	@Override
+	protected final int getNumberCardsDealtToEachPlayer() {
+<span class="fc" id="L38">		return 5;</span>
+	}
+
+	@Override
+	protected final boolean canPlayersHandHoldTiebreakerCards(HandStrength playerHandStrength) {
+<span class="nc" id="L43">		return false; // Hand Strength not relevant in Euchre.</span>
+	}
+	
+	@Override
+	public void addPlayer(Player toAdd) {
+<span class="pc bpc" id="L48" title="1 of 2 branches missed.">		if (getNumberPlayers() == 4) {</span>
+<span class="nc" id="L49">			throw new RuntimeException(&quot;This game is already full, cannot accept any more players.&quot;);</span>
+		}
+		
+<span class="fc" id="L52">		super.addPlayer(toAdd);</span>
+<span class="fc" id="L53">	}</span>
+
+	@Override
+	public void newHand() {
+<span class="fc" id="L57">		super.newHand();</span>
+<span class="fc" id="L58">		kitty.clear();</span>
+<span class="fc" id="L59">	}</span>
+	
+	private void dealCardsIntoKitty() {
+		// Since only the top card in the kitty is of use in the playing of the
+		// game, no need to request three other cards be dealt.
+<span class="fc" id="L64">		kitty.add(getDeck().dealCard());</span>
+<span class="fc" id="L65">	}</span>
+	
+	@Override
+	public final void dealCardsToPlayers() {
+<span class="fc" id="L69">		super.dealCardsToPlayers();</span>
+		// Last four cards go into kitty.
+<span class="fc" id="L71">		dealCardsIntoKitty();</span>
+<span class="fc" id="L72">	}</span>
+	
+	public FrenchSuitedPlayingCard getInitialTrumpBiddingCardFromKitty() {
+<span class="fc" id="L75">		return kitty.get(0); // Top card in kitty.</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

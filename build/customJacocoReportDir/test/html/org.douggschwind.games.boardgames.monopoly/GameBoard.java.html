@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GameBoard.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">games</a> &gt; <a href="index.source.html" class="el_package">org.douggschwind.games.boardgames.monopoly</a> &gt; <span class="el_source">GameBoard.java</span></div><h1>GameBoard.java</h1><pre class="source lang-java linenums">package org.douggschwind.games.boardgames.monopoly;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.douggschwind.games.boardgames.monopoly.actioncard.ActionCard;
+import org.douggschwind.games.boardgames.monopoly.actioncard.DeckFactory;
+import org.douggschwind.games.boardgames.monopoly.space.BoardSpace;
+import org.douggschwind.games.common.DeckOfCards;
+
+/**
+ * This class houses the Collection of BoardSpace instances and their correct order as well
+ * as each of the Player's position within the board, and the Chance and Community Chest
+ * decks of cards too.
+ * @author Doug Gschwind
+ */
+public class GameBoard {
+	
+	private static final List&lt;BoardSpace&gt; boardSpaces;
+<span class="nc" id="L21">	private static final Map&lt;BoardSpace, Integer&gt; boardSpacePositionMap = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L22">	private static final Map&lt;Integer, BoardSpace&gt; positionBoardSpaceMap = new HashMap&lt;&gt;();</span>
+	private static final DeckOfCards&lt;ActionCard&gt; chanceDeck;
+	private static final DeckOfCards&lt;ActionCard&gt; communityChestDeck;
+	
+	static {
+<span class="nc" id="L27">		boardSpaces = GameBoardFactory.createGameBoard();</span>
+<span class="nc" id="L28">		int position = 0;</span>
+<span class="nc bnc" id="L29" title="All 2 branches missed.">		for (BoardSpace boardSpace : boardSpaces) {</span>
+<span class="nc" id="L30">			boardSpacePositionMap.put(boardSpace, position);</span>
+<span class="nc" id="L31">			positionBoardSpaceMap.put(position++, boardSpace);</span>
+<span class="nc" id="L32">		}</span>
+		
+<span class="nc" id="L34">		chanceDeck = DeckFactory.createChanceDeck();</span>
+<span class="nc" id="L35">		communityChestDeck = DeckFactory.createCommunityChestDeck();</span>
+<span class="nc" id="L36">	}</span>
+	
+<span class="nc" id="L38">	private Map&lt;Player, BoardSpace&gt; playerBoardSpaceMap = new HashMap&lt;&gt;();</span>
+	
+<span class="nc" id="L40">	public GameBoard() {</span>
+<span class="nc" id="L41">		reset();</span>
+<span class="nc" id="L42">	}</span>
+	
+	private void setPlayerStartingPosition(Player player) {
+		// Each Player starts at Go!
+<span class="nc" id="L46">		setPlayerBoardSpace(player, getGoBoardSpace());</span>
+<span class="nc" id="L47">	}</span>
+
+	void addPlayer(Player player) {
+<span class="nc" id="L50">		setPlayerStartingPosition(player);</span>
+<span class="nc" id="L51">	}</span>
+	
+	List&lt;BoardSpace&gt; getBoardSpaces() {
+<span class="nc" id="L54">		return boardSpaces;</span>
+	}
+	
+	BoardSpace getGoBoardSpace() {
+<span class="nc" id="L58">		return boardSpaces.get(GameBoardFactory.GO_SPACE_INDEX);</span>
+	}
+	
+	BoardSpace getIllinoisAveBoardSpace() {
+<span class="nc" id="L62">		return boardSpaces.get(GameBoardFactory.ILLINOIS_AVENUE_SPACE_INDEX);</span>
+	}
+	
+	BoardSpace getStCharlesPlaceBoardSpace() {
+<span class="nc" id="L66">		return boardSpaces.get(GameBoardFactory.ST_CHARLES_PLACE_SPACE_INDEX);</span>
+	}
+	
+	private int computeBoardPositionOfNearestUtility(int playerBoardPosition) {
+<span class="nc bnc" id="L70" title="All 2 branches missed.">		return (playerBoardPosition &lt; GameBoardFactory.FREE_PARKING_SPACE_INDEX) ? GameBoardFactory.ELECTRIC_COMPANY_SPACE_INDEX : GameBoardFactory.WATER_WORKS_SPACE_INDEX;</span>
+	}
+	
+	BoardSpace getNearestUtility(Player player) {
+<span class="nc" id="L74">		return positionBoardSpaceMap.get(computeBoardPositionOfNearestUtility(getPlayerBoardPosition(player)));</span>
+	}
+	
+	private int computeBoardPositionOfNearestRailroad(int playerBoardPosition) {
+<span class="nc bnc" id="L78" title="All 2 branches missed.">		if (playerBoardPosition &lt; GameBoardFactory.JAIL_SPACE_INDEX) {</span>
+<span class="nc" id="L79">			return GameBoardFactory.READING_RAILROAD_SPACE_INDEX;</span>
+<span class="nc bnc" id="L80" title="All 2 branches missed.">		} else if (playerBoardPosition &lt; GameBoardFactory.FREE_PARKING_SPACE_INDEX) {</span>
+<span class="nc" id="L81">			return GameBoardFactory.PENNSYLVANIA_RAILROAD_SPACE_INDEX;</span>
+<span class="nc bnc" id="L82" title="All 2 branches missed.">		} else if (playerBoardPosition &lt; GameBoardFactory.GO_DIRECTLY_TO_JAIL_SPACE_INDEX) {</span>
+<span class="nc" id="L83">			return GameBoardFactory.B_O_RAILROAD_SPACE_INDEX;</span>
+		} else {
+<span class="nc" id="L85">			return GameBoardFactory.SHORT_LINE_RAILROAD_SPACE_INDEX;</span>
+		}
+	}
+	
+	BoardSpace getNearestRailroad(Player player) {
+<span class="nc" id="L90">		return positionBoardSpaceMap.get(computeBoardPositionOfNearestRailroad(getPlayerBoardPosition(player)));</span>
+	}
+	
+	BoardSpace goBackThreeSpaces(Player player) {
+<span class="nc" id="L94">		BoardSpace currentPlayerBoardSpace = getPlayerBoardSpace(player);</span>
+<span class="nc" id="L95">		int currentPlayerBoardPosition = boardSpacePositionMap.get(currentPlayerBoardSpace);</span>
+<span class="nc" id="L96">		int newPlayerBoardPosition = currentPlayerBoardPosition - 3;</span>
+<span class="nc bnc" id="L97" title="All 2 branches missed.">		if (newPlayerBoardPosition &lt; 0) {</span>
+<span class="nc" id="L98">			newPlayerBoardPosition = GameBoardFactory.NUM_BOARD_SPACES_TOTAL + newPlayerBoardPosition;</span>
+		}
+<span class="nc" id="L100">		return positionBoardSpaceMap.get(newPlayerBoardPosition);</span>
+	}
+	
+	BoardSpace getReadingRailroadBoardSpace() {
+<span class="nc" id="L104">		return boardSpaces.get(GameBoardFactory.READING_RAILROAD_SPACE_INDEX);</span>
+	}
+	
+	BoardSpace getBoardwalkBoardSpace() {
+<span class="nc" id="L108">		return boardSpaces.get(GameBoardFactory.BOARDWALK_SPACE_INDEX);</span>
+	}
+	
+	BoardSpace findBoardSpaceWherePlayerHasLanded(Player player, DiceRollResult diceRollResult) {
+<span class="nc" id="L112">		BoardSpace currentPlayerBoardSpace = getPlayerBoardSpace(player);</span>
+<span class="nc" id="L113">		int currentPlayerPosition = boardSpacePositionMap.get(currentPlayerBoardSpace);</span>
+<span class="nc" id="L114">		int newPlayerPosition = currentPlayerPosition + diceRollResult.getDiceRollTotal();</span>
+		
+<span class="nc bnc" id="L116" title="All 2 branches missed.">		if (newPlayerPosition &gt;= GameBoardFactory.NUM_BOARD_SPACES_TOTAL) {</span>
+			// Player passed Go!
+<span class="nc" id="L118">			newPlayerPosition = (newPlayerPosition % GameBoardFactory.NUM_BOARD_SPACES_TOTAL);</span>
+		}
+		
+<span class="nc" id="L121">		return positionBoardSpaceMap.get(newPlayerPosition);</span>
+	}
+	
+	boolean didPlayerLandOnOrPassGo(BoardSpace startingBoardSpace, BoardSpace endingBoardSpace) {
+<span class="nc" id="L125">		int startingPosition = boardSpacePositionMap.get(startingBoardSpace);</span>
+<span class="nc" id="L126">		int endingPosition = boardSpacePositionMap.get(endingBoardSpace);</span>
+<span class="nc bnc" id="L127" title="All 2 branches missed.">		return (endingPosition &lt; startingPosition);</span>
+	}
+	
+	/**
+	 * Obtains the Player's current position on the board.
+	 * @param player
+	 * @return
+	 */
+	BoardSpace getPlayerBoardSpace(Player player) {
+<span class="nc" id="L136">		return playerBoardSpaceMap.get(player);</span>
+	}
+	
+	private int getPlayerBoardPosition(Player player) {
+<span class="nc" id="L140">		BoardSpace currentPlayerBoardSpace = getPlayerBoardSpace(player);</span>
+<span class="nc" id="L141">		return boardSpacePositionMap.get(currentPlayerBoardSpace);</span>
+	}
+	
+	/**
+	 * Sets the Player's position on the board.
+	 * @param player
+	 * @param boardSpace
+	 */
+	void setPlayerBoardSpace(Player player, BoardSpace boardSpace) {
+<span class="nc" id="L150">		playerBoardSpaceMap.put(player, boardSpace);</span>
+<span class="nc" id="L151">	}</span>
+	
+	void sendPlayerToJail(Player player) {
+<span class="nc" id="L154">		setPlayerBoardSpace(player, boardSpaces.get(GameBoardFactory.JAIL_SPACE_INDEX));</span>
+<span class="nc" id="L155">	}</span>
+	
+	ActionCard dealChanceCard() {
+<span class="nc" id="L158">		ActionCard result = null;</span>
+		try {
+<span class="nc" id="L160">			result = chanceDeck.dealCard();</span>
+<span class="nc" id="L161">		} catch (IllegalStateException ignored) {</span>
+<span class="nc" id="L162">			chanceDeck.shuffle();</span>
+<span class="nc" id="L163">			result = chanceDeck.dealCard();</span>
+<span class="nc" id="L164">		}</span>
+<span class="nc" id="L165">		return result;</span>
+	}
+	
+	ActionCard dealCommunityChestCard() {
+<span class="nc" id="L169">		ActionCard result = null;</span>
+		try {
+<span class="nc" id="L171">			result = communityChestDeck.dealCard();</span>
+<span class="nc" id="L172">		} catch (IllegalStateException ignored) {</span>
+<span class="nc" id="L173">			communityChestDeck.shuffle();</span>
+<span class="nc" id="L174">			result = communityChestDeck.dealCard();</span>
+<span class="nc" id="L175">		}</span>
+<span class="nc" id="L176">		return result;</span>
+	}
+	
+	void reset() {
+<span class="nc" id="L180">		boardSpaces.forEach(boardSpace -&gt; boardSpace.resetOwnership());</span>
+<span class="nc" id="L181">		DeedRecorder.clear();</span>
+<span class="nc" id="L182">		chanceDeck.shuffle();</span>
+<span class="nc" id="L183">		communityChestDeck.shuffle();</span>
+<span class="nc" id="L184">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

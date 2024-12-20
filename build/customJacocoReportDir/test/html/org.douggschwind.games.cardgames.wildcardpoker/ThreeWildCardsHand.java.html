@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ThreeWildCardsHand.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">games</a> &gt; <a href="index.source.html" class="el_package">org.douggschwind.games.cardgames.wildcardpoker</a> &gt; <span class="el_source">ThreeWildCardsHand.java</span></div><h1>ThreeWildCardsHand.java</h1><pre class="source lang-java linenums">package org.douggschwind.games.cardgames.wildcardpoker;
+
+import java.util.List;
+import java.util.Map;
+
+import org.douggschwind.games.cardgames.common.FrenchSuitedPlayingCard;
+import org.douggschwind.games.cardgames.poker.common.FourOfAKind;
+import org.douggschwind.games.cardgames.poker.common.HandStrength;
+import org.douggschwind.games.cardgames.poker.common.RoyalFlush;
+import org.douggschwind.games.cardgames.poker.common.StraightFlush;
+
+/**
+ * An instance of this class represents that the player has a
+ * hand with three wild cards within it and two natural cards.
+ * @author Doug Gschwind
+ */
+public class ThreeWildCardsHand extends WildCardHand {
+
+	/**
+	 * @param numNonWildKindOccurrencesMap A Map that houses the distinct
+	 * non wild Kinds found in the player's hand and the number of occurrences
+	 * per Kind in the hand.
+	 * @param numDistinctNonWildSuits One of : 1 or 2.
+	 * @param sortedNonWildCardsInHand Must be non-null.
+	 */
+	public ThreeWildCardsHand(Map&lt;FrenchSuitedPlayingCard.Kind, Integer&gt; numNonWildKindOccurrencesMap,
+			                  int numDistinctNonWildSuits,
+			                  List&lt;FrenchSuitedPlayingCard&gt; sortedNonWildCardsInHand) {
+<span class="fc" id="L29">		super(numNonWildKindOccurrencesMap, numDistinctNonWildSuits, sortedNonWildCardsInHand);</span>
+<span class="fc" id="L30">	}</span>
+	
+	@Override
+	protected final HandStrength determineBestPossibleHand() {
+<span class="fc bfc" id="L34" title="All 2 branches covered.">		if (getNumDistinctNonWildKinds() == 1) {</span>
+			// Here the player has a natural pair. With three wild
+			// cards that yields Five of a Kind.
+<span class="fc" id="L37">			return createFiveOfAKind(getSortedNonWildCardsInHand().iterator().next().getKind());</span>
+		}
+		
+		// The player does not have a natural pair. They do however at worst
+		// have four of a kind, but could instead have a Straight Flush or a
+		// Royal Flush.
+<span class="fc" id="L43">		FrenchSuitedPlayingCard highCard = getNonWildHighCard();</span>
+		
+<span class="fc bfc" id="L45" title="All 2 branches covered.">		if (isSingleSuited()) {</span>
+<span class="fc" id="L46">			TypeOfStraightThatCanBeFormed typeOfStraightThatCanBeFormed = determineTypeOfStraightThatCanBeFormed();</span>
+<span class="fc bfc" id="L47" title="All 2 branches covered.">			if (typeOfStraightThatCanBeFormed.isAceHighStraight()) {</span>
+<span class="fc" id="L48">				return new RoyalFlush();</span>
+<span class="pc bpc" id="L49" title="1 of 2 branches missed.">			} else if (typeOfStraightThatCanBeFormed.isAceLowStraight()) {</span>
+<span class="nc" id="L50">				return new StraightFlush(FrenchSuitedPlayingCard.Kind.Five);</span>
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">			} else if (typeOfStraightThatCanBeFormed.isStraight()) {</span>
+<span class="fc" id="L52">				return new StraightFlush(typeOfStraightThatCanBeFormed.getHighCardKind());</span>
+			}
+		}
+		
+		// The two non wild cards are NOT in the same suit, or are
+		// far enough apart from each other that the three wild cards
+		// cannot be used to form a Straight Flush.
+<span class="fc" id="L59">		return new FourOfAKind(highCard.getKind());</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

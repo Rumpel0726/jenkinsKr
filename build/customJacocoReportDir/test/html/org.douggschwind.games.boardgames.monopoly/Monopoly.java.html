@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Monopoly.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">games</a> &gt; <a href="index.source.html" class="el_package">org.douggschwind.games.boardgames.monopoly</a> &gt; <span class="el_source">Monopoly.java</span></div><h1>Monopoly.java</h1><pre class="source lang-java linenums">package org.douggschwind.games.boardgames.monopoly;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import org.douggschwind.games.boardgames.monopoly.actioncard.ActionCard;
+import org.douggschwind.games.boardgames.monopoly.actioncard.AdvanceToCard;
+import org.douggschwind.games.boardgames.monopoly.space.BoardSpace;
+import org.douggschwind.games.boardgames.monopoly.space.PrivateBoardSpace;
+import org.douggschwind.games.boardgames.monopoly.space.PropertyBoardSpace;
+import org.douggschwind.games.boardgames.monopoly.space.RailroadBoardSpace;
+import org.douggschwind.games.boardgames.monopoly.space.UtilityBoardSpace;
+import org.douggschwind.games.boardgames.monopoly.title.MonopolyDefinition;
+import org.douggschwind.games.boardgames.monopoly.title.Title;
+import org.douggschwind.games.boardgames.monopoly.title.TitleDeed;
+
+/**
+ * This class supports the actual execution of the game including the setting up of the board,
+ * allowing players to be added, the game to be played, and then a new game to be initiated.
+ * @author Doug Gschwind
+ */
+public class Monopoly {
+	
+<span class="nc" id="L28">	private static final GameBoard gameBoard = new GameBoard();</span>
+<span class="nc" id="L29">	private final List&lt;Player&gt; players = new ArrayList&lt;&gt;();</span>
+	
+<span class="nc" id="L31">	public Monopoly() {</span>
+<span class="nc" id="L32">		gameBoard.reset();</span>
+<span class="nc" id="L33">	}</span>
+
+	public void addPlayer(Player toAdd) {
+<span class="nc bnc" id="L36" title="All 2 branches missed.">		if (toAdd != null) {</span>
+<span class="nc" id="L37">			players.add(toAdd);</span>
+<span class="nc" id="L38">			gameBoard.addPlayer(toAdd);</span>
+		}
+<span class="nc" id="L40">	}</span>
+	
+	private int computeOwedRent(PrivateBoardSpace&lt;? extends Title&gt; boardSpace, Player spaceOwner, int diceRollTotal) {
+<span class="nc bnc" id="L43" title="All 2 branches missed.">		if (boardSpace.isProperty()) {</span>
+<span class="nc" id="L44">			PropertyBoardSpace propertyBoardSpace = (PropertyBoardSpace) boardSpace;</span>
+<span class="nc" id="L45">			return propertyBoardSpace.computeRent();</span>
+<span class="nc bnc" id="L46" title="All 2 branches missed.">		} else if (boardSpace.isRailroad()) {</span>
+<span class="nc" id="L47">			return ((RailroadBoardSpace) boardSpace).computeRent(spaceOwner.getNumberOwnedRailroads());</span>
+		} else {
+			// It is a Utility
+<span class="nc" id="L50">			return ((UtilityBoardSpace) boardSpace).computeRent(spaceOwner.getNumberOwnedUtilities(), diceRollTotal);</span>
+		}
+	}
+	
+	public void payPlayerFromBank(Player player, int amountToBePaid) {
+<span class="nc" id="L55">		player.receivePayment(amountToBePaid);</span>
+<span class="nc" id="L56">	}</span>
+	
+	/**
+	 * This method handles the case when one Player owes money to another Player or the Bank.
+	 * @param toMakePayment The Player that owes money.
+	 * @param amountToBePaid The amount owed.
+	 * @param toReceivePayment The Player that is to receive the amount owed. If null, this
+	 * means the payment is being made to the bank, and we ignore cash being paid to the Bank
+	 * as this software assumes the Bank has unlimited cash reserves.
+	 */
+	private void playerMakesPaymentToOpponent(Player toMakePayment, int amountToBePaid, Player toReceivePayment) {
+<span class="nc bnc" id="L67" title="All 2 branches missed.">		if (toMakePayment.makePayment(amountToBePaid)) {</span>
+<span class="nc bnc" id="L68" title="All 2 branches missed.">			if (toReceivePayment != null) {</span>
+<span class="nc" id="L69">				toReceivePayment.receivePayment(amountToBePaid);</span>
+			}
+		} else {
+			// toMakePayment Player unable to make payment to toReceivePayment Player and thus
+			// toMakePayment Player is bankrupt and eliminated from the game!
+<span class="nc" id="L74">			toMakePayment.transferAssetsToPlayerDueToDefaultingOnPaymentDue(toReceivePayment);</span>
+<span class="nc" id="L75">			System.out.println(&quot;!!! Bankrupt Alert Bankrupt Alert Bankrupt Alert Bankrupt Alert !!!&quot;);</span>
+<span class="nc" id="L76">			System.out.println(&quot;Player &quot; + toMakePayment.getName() + &quot; has been Bankrupted and is eliminated from the game!&quot;);</span>
+<span class="nc" id="L77">			System.out.println(&quot;!!! Bankrupt Alert Bankrupt Alert Bankrupt Alert Bankrupt Alert !!!&quot;);</span>
+		}
+<span class="nc" id="L79">	}</span>
+	
+	public void playerMakesPaymentToBank(Player toMakePayment, int amountToBePaid) {
+<span class="nc" id="L82">		playerMakesPaymentToOpponent(toMakePayment, amountToBePaid, null);</span>
+<span class="nc" id="L83">	}</span>
+	
+	public void payPlayerFromEachOpponent(Player playerToBePaid, int amountToBePaid) {
+<span class="nc" id="L86">		determineSolventPlayers().stream()</span>
+		    // Player to be payed, does not pay themselves, only their opponents do
+<span class="nc bnc" id="L88" title="All 2 branches missed.">		    .filter(opponent -&gt; !opponent.equals(playerToBePaid))</span>
+<span class="nc" id="L89">		    .forEach(opponent -&gt; playerMakesPaymentToOpponent(opponent, amountToBePaid, playerToBePaid));</span>
+<span class="nc" id="L90">	}</span>
+	
+	public void playerPaysToEachOpponent(Player playerThatMustMakePayment, int amountToBePaid) {
+<span class="nc" id="L93">		determineSolventPlayers().stream()</span>
+		    // Player pays all opponents, but not themselves
+<span class="nc bnc" id="L95" title="All 2 branches missed.">		    .filter(opponent -&gt; !opponent.equals(playerThatMustMakePayment))</span>
+<span class="nc" id="L96">		    .forEach(opponent -&gt; playerMakesPaymentToOpponent(playerThatMustMakePayment, amountToBePaid, opponent));</span>
+<span class="nc" id="L97">	}</span>
+	
+	public void playerHasAcquiredGetOutOfJailFreeCard(Player player) {
+<span class="nc" id="L100">		player.setHoldingGetOutOfJailFreeCard(true);</span>
+<span class="nc" id="L101">	}</span>
+	
+	public void playerIsAssessedAmountPerBuilding(Player player, int costPerHouse, int costPerHotel) {
+<span class="nc" id="L104">		int assessmentAmount = (player.getNumberHousesOnAllProperties() * costPerHouse) + </span>
+<span class="nc" id="L105">				               (player.getNumberHotelsOnAllProperties() * costPerHotel);</span>
+<span class="nc" id="L106">		playerMakesPaymentToBank(player, assessmentAmount);</span>
+<span class="nc" id="L107">	}</span>
+	
+	public void advancePlayerToBoardLocation(Player player, AdvanceToCard advanceToCard, int playerDiceRollTotal) {
+<span class="nc" id="L110">		boolean playerReachedOrPassedGo = false;</span>
+		BoardSpace playerLandedOn;
+		
+<span class="nc bnc" id="L113" title="All 9 branches missed.">		switch (advanceToCard.getLocation()) {</span>
+			case Go:
+<span class="nc" id="L115">				playerLandedOn = gameBoard.getGoBoardSpace();</span>
+<span class="nc" id="L116">				playerReachedOrPassedGo = true;</span>
+<span class="nc" id="L117">				break;</span>
+			case IllinoisAve:
+<span class="nc" id="L119">				playerLandedOn = gameBoard.getIllinoisAveBoardSpace();</span>
+<span class="nc" id="L120">				playerReachedOrPassedGo = gameBoard.didPlayerLandOnOrPassGo(gameBoard.getPlayerBoardSpace(player), playerLandedOn);</span>
+<span class="nc" id="L121">				break;</span>
+			case StCharlesPlace:
+<span class="nc" id="L123">				playerLandedOn = gameBoard.getStCharlesPlaceBoardSpace();</span>
+<span class="nc" id="L124">				playerReachedOrPassedGo = gameBoard.didPlayerLandOnOrPassGo(gameBoard.getPlayerBoardSpace(player), playerLandedOn);</span>
+<span class="nc" id="L125">				break;</span>
+			case NearestUtility:
+<span class="nc" id="L127">				playerLandedOn = gameBoard.getNearestUtility(player);</span>
+<span class="nc" id="L128">				break;</span>
+			case NearestRailroad:
+<span class="nc" id="L130">				playerLandedOn = gameBoard.getNearestRailroad(player);</span>
+<span class="nc" id="L131">				break;</span>
+			case GoBackThreeSpaces:
+<span class="nc" id="L133">				playerLandedOn = gameBoard.goBackThreeSpaces(player);</span>
+<span class="nc" id="L134">				break;</span>
+			case ReadingRailroad:
+<span class="nc" id="L136">				playerLandedOn = gameBoard.getReadingRailroadBoardSpace();</span>
+<span class="nc" id="L137">				playerReachedOrPassedGo = gameBoard.didPlayerLandOnOrPassGo(gameBoard.getPlayerBoardSpace(player), playerLandedOn);</span>
+<span class="nc" id="L138">				break;</span>
+			case Boardwalk:
+<span class="nc" id="L140">				playerLandedOn = gameBoard.getBoardwalkBoardSpace();</span>
+<span class="nc" id="L141">				break;</span>
+			case Jail:
+			default:
+<span class="nc" id="L144">				sendPlayerToJail(player);</span>
+<span class="nc" id="L145">				return;</span>
+		}
+		
+<span class="nc bnc" id="L148" title="All 4 branches missed.">		if ((playerReachedOrPassedGo) &amp;&amp; (advanceToCard.isHolderToReceive200DollarsIfReachingOrPassingGo())) {</span>
+<span class="nc" id="L149">			player.receivePayment(200);</span>
+		}
+		
+<span class="nc" id="L152">		playerHasLandedOnBoardSpace(player, playerLandedOn, playerDiceRollTotal);</span>
+<span class="nc" id="L153">	}</span>
+	
+	private void takeAction(Player player, ActionCard actionCard, int playerDiceRollTotal) {
+<span class="nc" id="L156">		actionCard.takeAction(this, player, playerDiceRollTotal);</span>
+<span class="nc" id="L157">	}</span>
+	
+	public void playerLandedOnChanceSpace(Player player, int playerDiceRollTotal) {
+<span class="nc" id="L160">		ActionCard chanceCard = gameBoard.dealChanceCard();</span>
+<span class="nc" id="L161">		System.out.println(&quot;Player has been dealt &quot; + chanceCard.getCardName() + &quot; Chance card&quot;);</span>
+<span class="nc" id="L162">		takeAction(player, chanceCard, playerDiceRollTotal);</span>
+<span class="nc" id="L163">	}</span>
+	
+	public void playerLandedOnCommunityChestSpace(Player player, int playerDiceRollTotal) {
+<span class="nc" id="L166">		ActionCard communityChestCard = gameBoard.dealCommunityChestCard();</span>
+<span class="nc" id="L167">		System.out.println(&quot;Player has been dealt &quot; + communityChestCard.getCardName() + &quot; Community Chest card&quot;);</span>
+<span class="nc" id="L168">		takeAction(player, communityChestCard, playerDiceRollTotal);</span>
+<span class="nc" id="L169">	}</span>
+	
+	private void sendPlayerToJail(Player player) {
+<span class="nc" id="L172">		gameBoard.sendPlayerToJail(player);</span>
+<span class="nc" id="L173">		player.setInJail(true);</span>
+<span class="nc" id="L174">	}</span>
+	
+	public void playerLandedOnGoToJailSpace(Player player) {
+<span class="nc" id="L177">		sendPlayerToJail(player);</span>
+<span class="nc" id="L178">		System.out.println(&quot;Player &quot; + player.getName() + &quot; has been sent to Jail!&quot;);</span>
+<span class="nc" id="L179">	}</span>
+	
+	public void playerLandedOnIncomeTaxSpace(Player player) {
+<span class="nc" id="L182">		playerMakesPaymentToBank(player, 200);</span>
+<span class="nc" id="L183">	}</span>
+	
+	public void playerLandedOnLuxuryTaxSpace(Player player) {
+<span class="nc" id="L186">		playerMakesPaymentToBank(player, 100);</span>
+<span class="nc" id="L187">	}</span>
+	
+	/**
+	 * Determines the Player(s) that are not yet bankrupt.
+	 * @return Will be non-null and contain at least one element.
+	 */
+	private List&lt;Player&gt; determineSolventPlayers() {
+<span class="nc bnc" id="L194" title="All 2 branches missed.">		return players.stream().filter(player -&gt; !player.isBankrupt()).collect(Collectors.toList());</span>
+	}
+	
+	private void playerHasLandedOnBoardSpace(Player player, BoardSpace landingSpace, int playerDiceRollTotal) {
+<span class="nc" id="L198">		gameBoard.setPlayerBoardSpace(player, landingSpace);</span>
+<span class="nc bnc" id="L199" title="All 2 branches missed.">		if (landingSpace.isPubliclyHeld()) {</span>
+			// This space not capable of being bought nor sold.
+<span class="nc" id="L201">			landingSpace.takeAction(this, player, playerDiceRollTotal);</span>
+		} else {
+			// This space capable of being bought or sold.
+<span class="nc" id="L204">			PrivateBoardSpace&lt;? extends Title&gt; privateBoardSpace = (PrivateBoardSpace&lt;? extends Title&gt;) landingSpace;</span>
+<span class="nc" id="L205">			Player spaceOwner = privateBoardSpace.getTitle().getOwner();</span>
+<span class="nc bnc" id="L206" title="All 2 branches missed.">			if (spaceOwner == null) {</span>
+				// space can be purchased by Player
+<span class="nc" id="L208">				boolean playerWouldLikeToPurchase = player.wouldYouLikeToPurchase(privateBoardSpace);</span>
+<span class="nc bnc" id="L209" title="All 2 branches missed.">				if (playerWouldLikeToPurchase) {</span>
+<span class="nc" id="L210">					playerMakesPaymentToBank(player, privateBoardSpace.getPurchasePrice());</span>
+<span class="nc" id="L211">					privateBoardSpace.getTitle().setOwner(player);</span>
+<span class="nc" id="L212">					System.out.println(&quot;Player &quot; + player.getName() + &quot; has purchased &quot; + privateBoardSpace.getName() + &quot; for $&quot; + privateBoardSpace.getPurchasePrice());</span>
+<span class="nc bnc" id="L213" title="All 2 branches missed.">					if (privateBoardSpace.getTitle().isPartOfMonopoly()) {</span>
+<span class="nc" id="L214">						System.out.println(&quot;Player has monopolized set of Titles that contains &quot; + privateBoardSpace.getName());</span>
+					}
+				}
+<span class="nc" id="L217">			} else {</span>
+<span class="nc bnc" id="L218" title="All 2 branches missed.">				if (spaceOwner.equals(player)) {</span>
+					// The player owns the space, do nothing.
+				} else {
+					// The player owes rent to the owner.
+<span class="nc" id="L222">					int rentAmountOwed = computeOwedRent(privateBoardSpace, spaceOwner, playerDiceRollTotal);</span>
+<span class="nc" id="L223">					playerMakesPaymentToOpponent(player, rentAmountOwed, spaceOwner);</span>
+<span class="nc" id="L224">					System.out.println(&quot;Player &quot; + player.getName() + &quot; paid rent in the amount of $&quot; + rentAmountOwed + &quot; to &quot; + spaceOwner.getName());</span>
+				}
+			}
+		}
+<span class="nc" id="L228">	}</span>
+	
+	private DiceRollResult playerTakingTurn(Player player) {
+<span class="nc" id="L231">		BoardSpace playerStartingBoardSpace = gameBoard.getPlayerBoardSpace(player);</span>
+<span class="nc" id="L232">		System.out.println(&quot;--------------------------------------------------------------------------------------&quot;);</span>
+<span class="nc" id="L233">		System.out.println(&quot;Player &quot; + player.getName() + &quot; starting on space : &quot; + playerStartingBoardSpace.getName() + &quot; with $&quot; + player.getBankAccountBalance() + &quot; cash&quot;);</span>
+		// Check and see if Player can improve upon their property, and if so, if they wish to.
+<span class="nc" id="L235">		Set&lt;MonopolyDefinition&gt; monopolizedProperties = player.getMonopolizedProperties();</span>
+<span class="nc bnc" id="L236" title="All 2 branches missed.">		if (!monopolizedProperties.isEmpty()) {</span>
+<span class="nc" id="L237">			System.out.println(&quot;Player &quot; + player.getName() + &quot; can improve upon their property if they so choose&quot;);</span>
+<span class="nc" id="L238">			Optional&lt;TitleDeed&gt; propertyToImproveOptional = player.findOwnedPropertyToImprove(monopolizedProperties);</span>
+<span class="nc bnc" id="L239" title="All 2 branches missed.">			if (propertyToImproveOptional.isPresent()) {</span>
+<span class="nc" id="L240">				TitleDeed propertyToImprove = propertyToImproveOptional.get();</span>
+<span class="nc" id="L241">				System.out.println(&quot;Player &quot; + player.getName() + &quot; has elected to improve upon &quot; + propertyToImprove.getName() + &quot; by adding one more house&quot;);</span>
+<span class="nc" id="L242">				playerMakesPaymentToBank(player, propertyToImprove.getPlayerBuildingPurchasePrice());</span>
+<span class="nc" id="L243">				DeedRecorder.addHouse(propertyToImprove);</span>
+<span class="nc" id="L244">				BuildingSummary buildingSummaryAfterChanges = DeedRecorder.getBuildingSummary(propertyToImprove);</span>
+<span class="nc" id="L245">				System.out.println(&quot;This property now has &quot; + buildingSummaryAfterChanges.getNumberHotels() + &quot; Hotel(s) and &quot; + buildingSummaryAfterChanges.getNumberHouses() + &quot; House(s) on it&quot;);</span>
+<span class="nc" id="L246">				System.out.println(&quot;Player now has $&quot; + player.getBankAccountBalance() + &quot; cash&quot;);</span>
+<span class="nc" id="L247">			} else {</span>
+<span class="nc" id="L248">				System.out.println(&quot;Player &quot; + player.getName() + &quot; has elected to NOT improve upon any of their properties at this time&quot;);</span>
+			}
+		}
+<span class="nc" id="L251">		DiceRollResult diceRollResult = player.rollDice();</span>
+<span class="nc" id="L252">		System.out.print(&quot;Player has rolled a &quot; + diceRollResult.getDiceRollTotal());</span>
+<span class="nc bnc" id="L253" title="All 2 branches missed.">		System.out.println(diceRollResult.wereDoublesRolled() ? &quot; with doubles&quot; : &quot;&quot;);</span>
+<span class="nc bnc" id="L254" title="All 2 branches missed.">		if (!playerStartingBoardSpace.canPlayerAdvance(player, diceRollResult)) {</span>
+<span class="nc" id="L255">			player.incrementNumFailedAttemptsToGetOutOfJail();</span>
+<span class="nc bnc" id="L256" title="All 2 branches missed.">			if (player.getNumFailedAttemptsToGetOutOfJail() &lt; 3) {</span>
+				// Player's turn is over
+<span class="nc" id="L258">				System.out.println(&quot; ... but doubles were not rolled so &quot; + player.getName() + &quot; remains in Jail!&quot;);</span>
+<span class="nc" id="L259">				return diceRollResult;</span>
+			} else {
+				// Otherwise, the Player must pay a fine of $50 and advance
+				// the number of spots on the dice they have thrown.
+<span class="nc" id="L263">				playerMakesPaymentToBank(player, 50);</span>
+<span class="nc" id="L264">				System.out.println(&quot;Player &quot; + player.getName() + &quot; fined $50 for failing to get out of Jail after 3 attempts&quot;);</span>
+			}
+		}
+<span class="nc" id="L267">		playerStartingBoardSpace.isDepartingThisSpace(player);</span>
+		
+		// Now we know what Space the player has landed on, lets go about
+		// determining all that can or must happen as a result.
+<span class="nc" id="L271">		BoardSpace playerLandedOn = gameBoard.findBoardSpaceWherePlayerHasLanded(player, diceRollResult);</span>
+<span class="nc" id="L272">		int diceRollTotal = diceRollResult.getDiceRollTotal();</span>
+<span class="nc bnc" id="L273" title="All 2 branches missed.">		if (gameBoard.didPlayerLandOnOrPassGo(playerStartingBoardSpace, playerLandedOn)) {</span>
+			// Player landed on or passed Go!
+<span class="nc" id="L275">			player.receivePayment(200);</span>
+<span class="nc" id="L276">			System.out.println(&quot;Player &quot; + player.getName() + &quot; has landed on or passed Go and has been paid $200&quot;);</span>
+		}
+		
+<span class="nc" id="L279">		System.out.println(&quot;Player has landed on &quot; + playerLandedOn.getName());</span>
+<span class="nc" id="L280">		playerHasLandedOnBoardSpace(player, playerLandedOn, diceRollTotal);</span>
+<span class="nc" id="L281">		System.out.println(&quot;Player finishes turn with $&quot; + player.getBankAccountBalance() + &quot; cash&quot;);</span>
+<span class="nc" id="L282">		return diceRollResult;</span>
+	}
+	
+	private int computeNumberTitlesAvailableForPurchase() {
+<span class="nc" id="L286">		Predicate&lt;? super BoardSpace&gt; titleIsAvailableForPurchase = boardSpace -&gt; {</span>
+<span class="nc bnc" id="L287" title="All 2 branches missed.">			if (boardSpace.canBePrivatelyHeld()) {</span>
+<span class="nc" id="L288">				Title title = ((PrivateBoardSpace&lt;? extends Title&gt;) boardSpace).getTitle();</span>
+<span class="nc" id="L289">				return title.isBankOwned();</span>
+			}
+			
+<span class="nc" id="L292">			return false;</span>
+		};
+		
+		// Will always be between zero and 22, therefore narrowing conversion to
+		// int is entirely safe.
+<span class="nc" id="L297">		return (int) gameBoard.getBoardSpaces().stream().filter(titleIsAvailableForPurchase).count();</span>
+	}
+	
+	private boolean haveAllTitleDeedsBeenPurchased() {
+<span class="nc bnc" id="L301" title="All 2 branches missed.">		return GameBoardFactory.getAvailableTitleDeeds().stream().allMatch(titleDeed -&gt; !titleDeed.isBankOwned());</span>
+	}
+	
+	private boolean doesAtLeastOnePlayerHoldAMonopoly() {
+<span class="nc bnc" id="L305" title="All 2 branches missed.">		return players.stream().anyMatch(player -&gt; !player.getMonopolizedProperties().isEmpty());</span>
+	}
+	
+	private void printGameResult(String gameResult) {
+<span class="nc" id="L309">		final String messageDelimiter = &quot;!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!&quot;;</span>
+<span class="nc" id="L310">		System.out.println(messageDelimiter);</span>
+<span class="nc" id="L311">		System.out.println(gameResult);</span>
+<span class="nc" id="L312">		System.out.println(messageDelimiter);</span>
+<span class="nc" id="L313">	}</span>
+	
+	public void playGame() {
+		// Now they each take a turn in succession until only one player
+		// is not yet bankrupt.
+<span class="nc" id="L318">		boolean checkForAllTitleDeedsPurchased = true;</span>
+<span class="nc" id="L319">		boolean doWeHaveAWinner = false;</span>
+<span class="nc bnc" id="L320" title="All 2 branches missed.">		while (doWeHaveAWinner == false) {</span>
+<span class="nc" id="L321">			System.out.println(&quot;::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::&quot;);</span>
+<span class="nc bnc" id="L322" title="All 2 branches missed.">			for (Player player : players) {</span>
+				// Skip bankrupt players.
+<span class="nc bnc" id="L324" title="All 2 branches missed.">				if (player.isBankrupt()) {</span>
+<span class="nc" id="L325">					continue;</span>
+				}
+				
+<span class="nc" id="L328">				int numberTimesPlayerHasRolledDoublesThisTurn = 0;</span>
+<span class="nc" id="L329">				boolean playerStartedTurnInJail = player.isInJail();</span>
+				
+<span class="nc bnc" id="L331" title="All 4 branches missed.">				if (playerStartedTurnInJail &amp;&amp; player.isHoldingGetOutOfJailFreeCard()) {</span>
+<span class="nc" id="L332">					boolean shouldUseGetOutOfJailFreeCard = player.getUseOfGetOutOfJailFreeCardPolicy().shouldUseGetOutOfJailFreeCard(player, computeNumberTitlesAvailableForPurchase());</span>
+<span class="nc bnc" id="L333" title="All 2 branches missed.">					if (shouldUseGetOutOfJailFreeCard) {</span>
+<span class="nc" id="L334">						player.setHoldingGetOutOfJailFreeCard(false);</span>
+<span class="nc" id="L335">						playerStartedTurnInJail = false;</span>
+					}
+				}
+				
+<span class="nc" id="L339">				DiceRollResult diceRollResult = playerTakingTurn(player);</span>
+<span class="nc bnc" id="L340" title="All 6 branches missed.">				while (diceRollResult.wereDoublesRolled() &amp;&amp; !playerStartedTurnInJail &amp;&amp; !player.isInJail()) {</span>
+					// Player rolls again! However, if the players rolls doubles
+					// three times in a row, they go directly to Jail!
+<span class="nc" id="L343">					numberTimesPlayerHasRolledDoublesThisTurn++;</span>
+					
+<span class="nc bnc" id="L345" title="All 2 branches missed.">					if (numberTimesPlayerHasRolledDoublesThisTurn == 3) {</span>
+<span class="nc" id="L346">						sendPlayerToJail(player);</span>
+<span class="nc" id="L347">						break;</span>
+					} else {
+<span class="nc" id="L349">						diceRollResult = playerTakingTurn(player);</span>
+					}
+				}
+				
+				// After each player's turn, if that Player went bankrupt as a result of their
+				// turn, check to see if there is only one Player left that is not bankrupt.
+				// In that case, that remaining Player is the winner of the game!
+<span class="nc" id="L356">				List&lt;Player&gt; solventPlayers = determineSolventPlayers();</span>
+<span class="nc bnc" id="L357" title="All 2 branches missed.">				if (solventPlayers.size() == 1) {</span>
+					// We have a winner!
+<span class="nc" id="L359">					doWeHaveAWinner = true;</span>
+<span class="nc" id="L360">					printGameResult(&quot;Player : &quot; + solventPlayers.get(0).getName() + &quot; is declared the Winner!&quot;);</span>
+<span class="nc" id="L361">					break;</span>
+				}
+				
+				// By the time all of the TitleDeed instances have been purchased, if no Player holds at least one Monopoly
+				// this game has no chance of finishing (until property negotiation is implemented if ever, Ha!), so lets just
+				// call it a draw now.
+<span class="nc bnc" id="L367" title="All 4 branches missed.">				if ((checkForAllTitleDeedsPurchased) &amp;&amp; (haveAllTitleDeedsBeenPurchased())) {</span>
+<span class="nc bnc" id="L368" title="All 2 branches missed.">					if (!doesAtLeastOnePlayerHoldAMonopoly()) {</span>
+						// Have to short circuit this game, Game Over!
+<span class="nc" id="L370">						printGameResult(&quot;A conclusion to this game is not possible since all of the TitleDeeds have been purchased and no player holds at least one Monopoly. Game terminating now.&quot;);</span>
+<span class="nc" id="L371">						System.exit(1);</span>
+					}
+					// Only do this check until all TitleDeeds have initially been purchased.
+<span class="nc" id="L374">					checkForAllTitleDeedsPurchased = false;</span>
+				}
+<span class="nc" id="L376">			}</span>
+		}
+<span class="nc" id="L378">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

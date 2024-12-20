@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Chess.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">games</a> &gt; <a href="index.source.html" class="el_package">org.douggschwind.games.chess</a> &gt; <span class="el_source">Chess.java</span></div><h1>Chess.java</h1><pre class="source lang-java linenums">package org.douggschwind.games.chess;
+
+import org.douggschwind.games.chess.moves.CastlingMove;
+import org.douggschwind.games.chess.moves.ChessMove;
+import org.douggschwind.games.chess.moves.CommonMove;
+import org.douggschwind.games.chess.piece.ChessPiece;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Optional;
+
+/**
+ * This class allows for a very rudimentary playing of the game of chess.
+ * @author Doug Gschwind
+ */
+public class Chess {
+    private static final String QUEEN_SIDE_CASTLING_MOVE_INSTRUCTION = &quot;qsc&quot;;
+    private static final String KING_SIDE_CASTLING_MOVE_INSTRUCTION = &quot;ksc&quot;;
+    private static final String CONCEDE_INSTRUCTION = &quot;x&quot;;
+
+<span class="nc" id="L22">    private final ChessBoard chessBoard = new ChessBoard();</span>
+
+<span class="nc" id="L24">    private Chess() {</span>
+<span class="nc" id="L25">    }</span>
+
+    /**
+     * Interpret the String representation of a BoardPosition.
+     * @param squareIdentifier Of the form nm, where n is a number between 1 and 8
+     *                         and m is a letter between a and h.
+     * @return Will be non-null.
+     * @throws IllegalArgumentException If the argument squareIdentifier cannot be resolved.
+     */
+    private BoardPosition resolveSquareIdentifier(String squareIdentifier)
+    throws IllegalArgumentException {
+<span class="nc bnc" id="L36" title="All 4 branches missed.">        if ((squareIdentifier == null) || (squareIdentifier.length() != 2)) {</span>
+<span class="nc" id="L37">            throw new IllegalArgumentException(&quot;Square identifier is malformed &lt;&quot; + squareIdentifier + &quot;&gt;&quot;);</span>
+        }
+
+<span class="nc" id="L40">        char rowIdentifier = squareIdentifier.charAt(0);</span>
+<span class="nc bnc" id="L41" title="All 4 branches missed.">        if ((rowIdentifier &lt; '1') || (rowIdentifier &gt; '8')) {</span>
+<span class="nc" id="L42">            String message = &quot;Invalid row identifier &lt;&quot; + rowIdentifier + &quot;&gt;. Must be between 1 and 8 inclusive&quot;;</span>
+<span class="nc" id="L43">            throw new IllegalArgumentException(message);</span>
+        }
+<span class="nc" id="L45">        char columnIdentifier = squareIdentifier.charAt(1);</span>
+<span class="nc bnc" id="L46" title="All 4 branches missed.">        if ((columnIdentifier &lt; 'a') || (columnIdentifier &gt; 'h')) {</span>
+<span class="nc" id="L47">            String message = &quot;Invalid column identifier &lt;&quot; + columnIdentifier + &quot;&gt;. Must be between a and h inclusive&quot;;</span>
+<span class="nc" id="L48">            throw new IllegalArgumentException(message);</span>
+        }
+
+<span class="nc" id="L51">        return new BoardPosition(BoardPosition.Row.getById(rowIdentifier - '0'),</span>
+<span class="nc" id="L52">                                 BoardPosition.Column.getById((columnIdentifier - 'a') + 1));</span>
+    }
+
+    private Optional&lt;CommonMove&lt;ChessPiece&gt;&gt; interpretCommonMoveInstruction(String moveInstruction) {
+<span class="nc" id="L56">        String[] squareIdentifiers = moveInstruction.split(&quot; &quot;);</span>
+<span class="nc bnc" id="L57" title="All 2 branches missed.">        if (squareIdentifiers.length != 2) {</span>
+<span class="nc" id="L58">            printMalformedMoveInstructionFeedback();</span>
+<span class="nc" id="L59">            return Optional.empty();</span>
+        }
+
+<span class="nc" id="L62">        String fromSquareIdentifier = squareIdentifiers[0];</span>
+<span class="nc" id="L63">        String toSquareIdentifier = squareIdentifiers[1];</span>
+
+        BoardPosition position1;
+        try {
+<span class="nc" id="L67">            position1 = resolveSquareIdentifier(fromSquareIdentifier);</span>
+<span class="nc" id="L68">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L69">            System.err.println(e.getMessage());</span>
+<span class="nc" id="L70">            return Optional.empty();</span>
+<span class="nc" id="L71">        }</span>
+
+        BoardPosition position2;
+        try {
+<span class="nc" id="L75">            position2 = resolveSquareIdentifier(toSquareIdentifier);</span>
+<span class="nc" id="L76">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L77">            System.err.println(e.getMessage());</span>
+<span class="nc" id="L78">            return Optional.empty();</span>
+<span class="nc" id="L79">        }</span>
+
+<span class="nc" id="L81">        Square from = chessBoard.getSquare(position1.getRow(), position1.getColumn());</span>
+<span class="nc bnc" id="L82" title="All 2 branches missed.">        if (!from.isOccupied()) {</span>
+<span class="nc" id="L83">            System.err.println(&quot;Invalid move instruction, square &quot; + fromSquareIdentifier + &quot; is not occupied&quot;);</span>
+<span class="nc" id="L84">            return Optional.empty();</span>
+        }
+<span class="nc" id="L86">        Square to = chessBoard.getSquare(position2.getRow(), position2.getColumn());</span>
+
+<span class="nc" id="L88">        Class&lt;? extends ChessPiece&gt; chessPieceClass = from.getResident().get().getClass();</span>
+<span class="nc" id="L89">        return Optional.of(new CommonMove&lt;ChessPiece&gt;(chessPieceClass, from, to));</span>
+    }
+
+    private Optional&lt;CastlingMove&gt; interpretCastlingInstruction(Player toMakeMove, String moveInstruction) {
+<span class="nc bnc" id="L93" title="All 2 branches missed.">        if (QUEEN_SIDE_CASTLING_MOVE_INSTRUCTION.equals(moveInstruction)) {</span>
+<span class="nc" id="L94">            return Optional.of(CastlingMove.newQueenSideMove(toMakeMove, chessBoard));</span>
+<span class="nc bnc" id="L95" title="All 2 branches missed.">        } else if (KING_SIDE_CASTLING_MOVE_INSTRUCTION.equals(moveInstruction)) {</span>
+<span class="nc" id="L96">            return Optional.of(CastlingMove.newKingSideMove(toMakeMove, chessBoard));</span>
+        }
+
+<span class="nc" id="L99">        return Optional.empty();</span>
+    }
+
+    private void printMalformedMoveInstructionFeedback() {
+<span class="nc" id="L103">        String message = &quot;Move instruction malformed. Valid move instructions are of the following forms:&quot;;</span>
+<span class="nc" id="L104">        System.err.println(message);</span>
+<span class="nc" id="L105">        System.err.println(&quot;\tbp1 bp2 (to move from BoardPosition 1 to BoardPosition 2. e.g. 8b 6c)&quot;);</span>
+<span class="nc" id="L106">        System.err.println(&quot;\t&quot; + QUEEN_SIDE_CASTLING_MOVE_INSTRUCTION + &quot; (for Queen side Castling)&quot;);</span>
+<span class="nc" id="L107">        System.err.println(&quot;\t&quot; + KING_SIDE_CASTLING_MOVE_INSTRUCTION + &quot; (for King side Castling)&quot;);</span>
+<span class="nc" id="L108">        System.err.println(&quot;\t&quot; + CONCEDE_INSTRUCTION + &quot; (to concede game)&quot;);</span>
+<span class="nc" id="L109">        System.err.println();</span>
+<span class="nc" id="L110">    }</span>
+
+    private Optional&lt;? extends ChessMove&gt; interpretMoveInstruction(Player toMakeMove, String moveInstruction) {
+<span class="nc bnc" id="L113" title="All 6 branches missed.">        if ((moveInstruction == null) || moveInstruction.isEmpty() || moveInstruction.split(&quot; &quot;).length &gt; 2) {</span>
+<span class="nc" id="L114">            printMalformedMoveInstructionFeedback();</span>
+<span class="nc" id="L115">            return Optional.empty();</span>
+        }
+
+<span class="nc bnc" id="L118" title="All 2 branches missed.">        if (CONCEDE_INSTRUCTION.equals(moveInstruction)) {</span>
+<span class="nc" id="L119">            String message = &quot;Player &quot; +</span>
+<span class="nc" id="L120">                   toMakeMove.name() +</span>
+                   &quot; has conceded. Game has been won by Player &quot; +
+<span class="nc" id="L122">                   toMakeMove.getOpponent().name();</span>
+<span class="nc" id="L123">            System.out.println(message);</span>
+<span class="nc" id="L124">            System.exit(0);</span>
+        }
+
+<span class="nc bnc" id="L127" title="All 2 branches missed.">        if (QUEEN_SIDE_CASTLING_MOVE_INSTRUCTION.equals(moveInstruction) ||</span>
+<span class="nc bnc" id="L128" title="All 2 branches missed.">            KING_SIDE_CASTLING_MOVE_INSTRUCTION.equals(moveInstruction)) {</span>
+<span class="nc" id="L129">            return interpretCastlingInstruction(toMakeMove, moveInstruction);</span>
+        } else {
+<span class="nc" id="L131">            return interpretCommonMoveInstruction(moveInstruction);</span>
+        }
+    }
+
+    private Optional&lt;? extends ChessMove&gt; getPlayerMoveInstruction(BufferedReader reader, Player toMakeMove) {
+        try {
+<span class="nc" id="L137">            String moveInstruction = reader.readLine();</span>
+<span class="nc" id="L138">            return interpretMoveInstruction(toMakeMove, moveInstruction);</span>
+<span class="nc" id="L139">        } catch (IOException ignored) {</span>
+            // Never expect to get here.
+<span class="nc" id="L141">            System.err.println(ignored.getMessage());</span>
+<span class="nc" id="L142">            return Optional.empty();</span>
+        }
+    }
+
+    private Optional&lt;? extends ChessMove&gt; getValidPlayerMoveInstruction(BufferedReader reader, Player toMakeMove) {
+<span class="nc" id="L147">        final String playerMoveInstructionPrompt = &quot;Player &quot; + toMakeMove.name() + &quot; move : &quot;;</span>
+<span class="nc" id="L148">        System.out.print(playerMoveInstructionPrompt);</span>
+
+<span class="nc" id="L150">        Optional&lt;? extends ChessMove&gt; chessMoveOptional = getPlayerMoveInstruction(reader, toMakeMove);</span>
+<span class="nc bnc" id="L151" title="All 2 branches missed.">        while (!chessMoveOptional.isPresent()) {</span>
+            // Issue println against System.out for output alignment for end user.
+<span class="nc" id="L153">            System.out.println();</span>
+<span class="nc" id="L154">            System.out.print(playerMoveInstructionPrompt);</span>
+<span class="nc" id="L155">            chessMoveOptional = getPlayerMoveInstruction(reader, toMakeMove);</span>
+        }
+
+<span class="nc" id="L158">        ChessMove proposedMove = chessMoveOptional.get();</span>
+<span class="nc bnc" id="L159" title="All 2 branches missed.">        if (proposedMove.isPermitted(toMakeMove, chessBoard)) {</span>
+<span class="nc" id="L160">            return Optional.of(proposedMove);</span>
+        } else {
+<span class="nc" id="L162">            System.err.println(&quot;This move is not permitted&quot;);</span>
+<span class="nc" id="L163">            return Optional.empty();</span>
+        }
+    }
+
+    private void printChessBoardState() {
+<span class="nc bnc" id="L168" title="All 2 branches missed.">        for (String rowOutput : chessBoard.print()) {</span>
+<span class="nc" id="L169">            System.out.println(rowOutput);</span>
+        }
+<span class="nc" id="L171">    }</span>
+
+    private void playGame() {
+<span class="nc" id="L174">        Player toMakeMove = Player.BLACK;</span>
+
+<span class="nc" id="L176">        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));</span>
+
+        // TODO: Check for checkmate
+        while (true) { // TODO
+<span class="nc" id="L180">            printChessBoardState();</span>
+
+<span class="nc" id="L182">            Optional&lt;? extends ChessMove&gt; validPlayerMoveOptional = getValidPlayerMoveInstruction(reader, toMakeMove);</span>
+<span class="nc" id="L183">            System.out.println();</span>
+<span class="nc bnc" id="L184" title="All 2 branches missed.">            while (!validPlayerMoveOptional.isPresent()) {</span>
+<span class="nc" id="L185">                validPlayerMoveOptional = getValidPlayerMoveInstruction(reader, toMakeMove);</span>
+            }
+
+<span class="nc" id="L188">            ChessMove proposedMove = validPlayerMoveOptional.get();</span>
+<span class="nc bnc" id="L189" title="All 2 branches missed.">            if (proposedMove.isCastlingMove()) {</span>
+<span class="nc" id="L190">                CastlingMove validatedCastlingMove = (CastlingMove) proposedMove;</span>
+<span class="nc" id="L191">                validatedCastlingMove.handleMove(chessBoard);</span>
+<span class="nc bnc" id="L192" title="All 2 branches missed.">            } else if (proposedMove.isCommonMove()) {</span>
+<span class="nc" id="L193">                CommonMove&lt;ChessPiece&gt; validatedCommonMove = (CommonMove) proposedMove;</span>
+<span class="nc" id="L194">                ChessPiece toMove = validatedCommonMove.getFrom().getResident().get();</span>
+<span class="nc" id="L195">                toMove.moveTo(chessBoard, validatedCommonMove);</span>
+            }
+
+<span class="nc bnc" id="L198" title="All 2 branches missed.">            toMakeMove = (toMakeMove == Player.BLACK) ? Player.WHITE : Player.BLACK;</span>
+<span class="nc" id="L199">        }</span>
+    }
+
+    private void playAgain() {
+<span class="nc" id="L203">        chessBoard.reset();</span>
+<span class="nc" id="L204">        playGame();</span>
+<span class="nc" id="L205">    }</span>
+
+    public static void main(String[] args) {
+<span class="nc" id="L208">        Chess game = new Chess();</span>
+<span class="nc" id="L209">        game.playGame();</span>
+<span class="nc" id="L210">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

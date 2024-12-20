@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Title.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">games</a> &gt; <a href="index.source.html" class="el_package">org.douggschwind.games.boardgames.monopoly.title</a> &gt; <span class="el_source">Title.java</span></div><h1>Title.java</h1><pre class="source lang-java linenums">package org.douggschwind.games.boardgames.monopoly.title;
+
+import org.douggschwind.games.boardgames.monopoly.Player;
+
+/**
+ * An instance of this class represents something that can be purchased and owned by
+ * a given Player : property, railroad, or utility. An instance of this class that
+ * is NOT a TitleDeed is a railroad or utility for which a usage fee can be charged
+ * to an opponent.
+ * @author Doug Gschwind
+ */
+public class Title {
+	private final MonopolyDefinition monopolyDefinition;
+	private final String name;
+	private final int purchasePrice;
+	private final int mortgageValue;
+	private final int mortgageLiftingPrice;
+	private Player owner;
+	private boolean mortgaged;
+	
+	public Title(MonopolyDefinition monopolyDefinition,
+			     String name,
+<span class="fc" id="L23">			     int purchasePrice) {</span>
+<span class="fc" id="L24">		this.monopolyDefinition = monopolyDefinition;</span>
+<span class="fc" id="L25">		this.name = name;</span>
+<span class="fc" id="L26">		this.purchasePrice = purchasePrice;</span>
+<span class="fc" id="L27">		this.mortgageValue = purchasePrice / 2;</span>
+<span class="fc" id="L28">		this.mortgageLiftingPrice = (int) (mortgageValue * 1.1); // 10% above mortgageValue</span>
+<span class="fc" id="L29">		monopolyDefinition.addTitle(this);</span>
+<span class="fc" id="L30">	}</span>
+	
+	public boolean isTitleDeed() {
+<span class="fc" id="L33">		return false;</span>
+	}
+	
+	public MonopolyDefinition getMonopolyDefinition() {
+<span class="fc" id="L37">		return monopolyDefinition;</span>
+	}
+	
+	public boolean isProperty() {
+<span class="fc" id="L41">		return getMonopolyDefinition().isProperty();</span>
+	}
+	
+	public boolean isRailroad() {
+<span class="fc" id="L45">		return getMonopolyDefinition().isRailroad();</span>
+	}
+	
+	public boolean isUtility() {
+<span class="fc" id="L49">		return getMonopolyDefinition().isUtility();</span>
+	}
+	
+	public String getName() {
+<span class="nc" id="L53">		return name;</span>
+	}
+
+	public int getPurchasePrice() {
+<span class="fc" id="L57">		return purchasePrice;</span>
+	}
+
+	public int getMortgageValue() {
+<span class="fc" id="L61">		return mortgageValue;</span>
+	}
+	
+	public int getMortgageLiftingPrice() {
+<span class="nc" id="L65">		return mortgageLiftingPrice;</span>
+	}
+
+	public Player getOwner() {
+<span class="fc" id="L69">		return owner;</span>
+	}
+
+	public void setOwner(Player owner) {
+<span class="fc" id="L73">		this.owner = owner;</span>
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">		if (owner == null) {</span>
+			// Ownership is changing back to the Bank, thus
+			// this Title is no longer mortgaged.
+<span class="nc" id="L77">			setMortgaged(false);</span>
+		} else {
+<span class="fc" id="L79">			owner.acceptOwnership(this);</span>
+		}
+<span class="fc" id="L81">	}</span>
+	
+	public boolean isBankOwned() {
+<span class="nc bnc" id="L84" title="All 2 branches missed.">		return (getOwner() == null);</span>
+	}
+	
+	/**
+	 * Determines whether or not the given Player is the owner of this Property.
+	 * @param player Expected to be non-null.
+	 * @return true if so, false otherwise.
+	 */
+	public boolean isOwner(Player player) {
+<span class="nc bnc" id="L93" title="All 4 branches missed.">		return ((getOwner() != null) &amp;&amp; (getOwner().equals(player)));</span>
+	}
+	
+	public boolean isPartOfMonopoly() {
+<span class="nc" id="L97">		return getMonopolyDefinition().hasBeenMonopolized();</span>
+	}
+
+	public boolean isMortgaged() {
+<span class="fc" id="L101">		return mortgaged;</span>
+	}
+
+	public void setMortgaged(boolean newValue) {
+<span class="fc" id="L105">		mortgaged = newValue;</span>
+<span class="fc" id="L106">	}</span>
+	
+	public int computeBuildingsLiquidationValue(int numberHousesOnProperty, int numberHotelsOnProperty) {
+<span class="nc" id="L109">		return 0;</span>
+	}
+	
+	/**
+	 * Typically used to reset game state before playing a new game.
+	 */
+	public void reset() {
+<span class="nc" id="L116">		setOwner(null);</span>
+<span class="nc" id="L117">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

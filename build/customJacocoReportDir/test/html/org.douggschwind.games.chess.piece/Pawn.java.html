@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Pawn.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">games</a> &gt; <a href="index.source.html" class="el_package">org.douggschwind.games.chess.piece</a> &gt; <span class="el_source">Pawn.java</span></div><h1>Pawn.java</h1><pre class="source lang-java linenums">package org.douggschwind.games.chess.piece;
+
+import org.douggschwind.games.chess.BoardPosition;
+import org.douggschwind.games.chess.ChessBoard;
+import org.douggschwind.games.chess.moves.CommonMove;
+import org.douggschwind.games.chess.Player;
+import org.douggschwind.games.chess.Square;
+
+/**
+ * Represents one of the eight Pawn pieces in the game of Chess, for a given Player.
+ * @author Doug Gschwind
+ */
+public class Pawn extends ChessPiece {
+    private final AdvancingDirection advancingDirection;
+    private boolean initialMoveWasTwoSquares;
+    private boolean reachedFarSideOfBoard;
+
+    // Notes the direction of movement that a ChessPiece makes when advancing
+<span class="fc" id="L19">    private enum AdvancingDirection {</span>
+<span class="fc" id="L20">        TOP_TO_BOTTOM,</span>
+<span class="fc" id="L21">        BOTTOM_TO_TOP;</span>
+    }
+
+    public Pawn(Player owner) {
+<span class="fc" id="L25">        super(owner);</span>
+<span class="fc bfc" id="L26" title="All 2 branches covered.">        if (owner.isBlack()) {</span>
+<span class="fc" id="L27">            advancingDirection = AdvancingDirection.TOP_TO_BOTTOM;</span>
+        } else {
+<span class="fc" id="L29">            advancingDirection = AdvancingDirection.BOTTOM_TO_TOP;</span>
+        }
+<span class="fc" id="L31">    }</span>
+
+    @Override
+    public final boolean isPawn() {
+<span class="fc" id="L35">        return true;</span>
+    }
+
+    private AdvancingDirection getAdvancingDirection() {
+<span class="fc" id="L39">        return advancingDirection;</span>
+    }
+
+    /**
+     * Pawns move vertically forward one square, with the option to move two squares if they have not yet moved.
+     * Pawns are the only piece to capture different to how they move. Pawns capture one square diagonally in a forward
+     * direction. Pawns are unable to move backwards on captures or moves. Upon reaching the other side of the board a
+     * pawn promotes into any other piece, except for a king. Additionally, pawns can make a special move named
+     * En Passant.
+     * @param chessBoard Must be non-null.
+     * @param proposedMove Must be non-null and properly populated.
+     * @return
+     */
+    @Override
+    public boolean canMoveTo(ChessBoard chessBoard, CommonMove proposedMove) {
+<span class="pc bpc" id="L54" title="1 of 2 branches missed.">        if (hasReachedFarSideOfBoard()) {</span>
+            // This instance can now move like any other piece, other than a King.
+<span class="nc bnc" id="L56" title="All 6 branches missed.">            if (proposedMove.isHorizontalMove() || proposedMove.isVerticalMove() || proposedMove.isDiagonalMove()) {</span>
+<span class="nc" id="L57">                return chessBoard.isPathClear(proposedMove);</span>
+            }
+
+            // Otherwise, lets see if the move is that of a Knight.
+<span class="nc" id="L61">            return isKnightMovement(proposedMove);</span>
+        } else {
+<span class="fc" id="L63">            final Square from = proposedMove.getFrom();</span>
+<span class="fc" id="L64">            final Square to = proposedMove.getTo();</span>
+
+<span class="fc" id="L66">            int fromRow = from.getRow().getId();</span>
+<span class="fc" id="L67">            int toRow = to.getRow().getId();</span>
+
+            int numVerticalSquaresToAdvance;
+<span class="fc bfc" id="L70" title="All 2 branches covered.">            if (getAdvancingDirection() == AdvancingDirection.TOP_TO_BOTTOM) {</span>
+<span class="fc" id="L71">                numVerticalSquaresToAdvance = fromRow - toRow;</span>
+            } else {
+                // Can only move bottom to top up the board.
+<span class="fc" id="L74">                numVerticalSquaresToAdvance = toRow - fromRow;</span>
+            }
+<span class="pc bpc" id="L76" title="1 of 2 branches missed.">            if (numVerticalSquaresToAdvance &lt;= 0) {</span>
+<span class="nc" id="L77">                return false;</span>
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">            } else if (numVerticalSquaresToAdvance &gt; 2) {</span>
+<span class="nc" id="L79">                return false;</span>
+            }
+
+<span class="fc" id="L82">            int numHorizontalSquaresToMove = to.getColumn().getId() - from.getColumn().getId();</span>
+<span class="pc bpc" id="L83" title="2 of 4 branches missed.">            if ((numHorizontalSquaresToMove &lt; -1) || (numHorizontalSquaresToMove &gt; 1)) {</span>
+<span class="nc" id="L84">                return false;</span>
+<span class="fc bfc" id="L85" title="All 2 branches covered.">            } else if (numHorizontalSquaresToMove == 0) {</span>
+                // Advancing mode. Can move two spaces on the first move, or just one, but since just advancing,
+                // the target Square must be unoccupied since a Pawn cannot capture when advancing.
+<span class="pc bpc" id="L88" title="1 of 2 branches missed.">                if (to.isOccupied()) {</span>
+<span class="nc" id="L89">                    return false;</span>
+                }
+<span class="pc bpc" id="L91" title="1 of 2 branches missed.">                if (numVerticalSquaresToAdvance == 2) {</span>
+<span class="nc bnc" id="L92" title="All 2 branches missed.">                    if (hasEverBeenMoved()) {</span>
+<span class="nc" id="L93">                        return false;</span>
+                    } else {
+                        // Square being passed must be empty.
+<span class="nc" id="L96">                        return chessBoard.isPathClear(proposedMove);</span>
+                    }
+                }
+<span class="fc" id="L99">                return true;</span>
+            } else {
+                // Capturing mode.
+<span class="pc bpc" id="L102" title="1 of 2 branches missed.">                if (to.isOccupied()) {</span>
+<span class="nc" id="L103">                    return to.isOccupiedByOpponent(from);</span>
+                } else {
+                    // The square being moved to is unoccupied. The only way this move is possible for a Pawn is
+                    // if the En Passant rule comes into play.
+<span class="fc" id="L107">                    Square possibleEnPassantSquare = getPossibleEnPassantSquare(chessBoard, proposedMove);</span>
+<span class="pc bpc" id="L108" title="1 of 2 branches missed.">                    if (!possibleEnPassantSquare.isOccupied()) {</span>
+<span class="nc" id="L109">                        return false;</span>
+                    } else {
+<span class="fc" id="L111">                        ChessPiece resident = possibleEnPassantSquare.getResident().get();</span>
+<span class="pc bpc" id="L112" title="2 of 4 branches missed.">                        return resident.isPawn() &amp;&amp; ((Pawn) resident).canBeCapturedDueToEnPassant();</span>
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Finds the Square that could house an En Passant victim.
+     * @param chessBoard
+     * @param commonMove Must be non-null and properly populated.
+     * @return Will be non-null.
+     */
+    private Square getPossibleEnPassantSquare(ChessBoard chessBoard, CommonMove commonMove) {
+<span class="fc" id="L126">        return chessBoard.getSquare(commonMove.getFrom().getRow(), commonMove.getTo().getColumn());</span>
+    }
+
+    private void attemptCaptureDueToEnPassant(Square possibleEnPassantSquare) {
+<span class="fc bfc" id="L130" title="All 2 branches covered.">        if (possibleEnPassantSquare.isOccupied()) {</span>
+<span class="fc" id="L131">            ChessPiece residentSubject = possibleEnPassantSquare.getResident().get();</span>
+<span class="pc bpc" id="L132" title="2 of 4 branches missed.">            if (residentSubject.isPawn() &amp;&amp; ((Pawn) residentSubject).canBeCapturedDueToEnPassant()) {</span>
+                // Boom. The Pawn in the possibleEnPassantSquare can in fact be captured
+                // as a result of this move.
+<span class="fc" id="L135">                residentSubject.markCaptured();</span>
+<span class="fc" id="L136">                possibleEnPassantSquare.empty();</span>
+            }
+        }
+<span class="fc" id="L139">    }</span>
+
+    @Override
+    protected void handleMoveTo(ChessBoard chessBoard, CommonMove move) {
+<span class="fc" id="L143">        basicMove(move);</span>
+
+<span class="fc" id="L145">        final Square from = move.getFrom();</span>
+<span class="fc" id="L146">        final Square to = move.getTo();</span>
+
+<span class="fc" id="L148">        attemptCaptureDueToEnPassant(getPossibleEnPassantSquare(chessBoard, move));</span>
+
+<span class="fc bfc" id="L150" title="All 2 branches covered.">        if (!hasEverBeenMoved()) {</span>
+<span class="fc bfc" id="L151" title="All 2 branches covered.">            initialMoveWasTwoSquares = (move.getAbsNumRowsMovement() == 2);</span>
+<span class="pc bpc" id="L152" title="1 of 2 branches missed.">        } else if (!reachedFarSideOfBoard) {</span>
+<span class="fc" id="L153">            int initialRow = getInitialPosition().getRow().getId();</span>
+<span class="pc bpc" id="L154" title="1 of 2 branches missed.">            reachedFarSideOfBoard =</span>
+<span class="pc bpc" id="L155" title="3 of 4 branches missed.">                (((initialRow == BoardPosition.MAX_ROW) &amp;&amp; (to.getRow().getId() == BoardPosition.MIN_ROW)) ||</span>
+<span class="pc bnc" id="L156" title="All 2 branches missed.">                 ((initialRow == BoardPosition.MIN_ROW) &amp;&amp; (to.getRow().getId() == BoardPosition.MAX_ROW)));</span>
+        }
+<span class="fc" id="L158">    }</span>
+
+    public boolean canBeCapturedDueToEnPassant() {
+<span class="pc bpc" id="L161" title="2 of 4 branches missed.">        return ((getNumTimesMoved() == 1) &amp;&amp; initialMoveWasTwoSquares);</span>
+    }
+
+    private boolean hasReachedFarSideOfBoard() {
+<span class="fc" id="L165">        return reachedFarSideOfBoard;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

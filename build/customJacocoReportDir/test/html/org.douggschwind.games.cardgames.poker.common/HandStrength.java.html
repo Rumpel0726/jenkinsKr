@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HandStrength.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">games</a> &gt; <a href="index.source.html" class="el_package">org.douggschwind.games.cardgames.poker.common</a> &gt; <span class="el_source">HandStrength.java</span></div><h1>HandStrength.java</h1><pre class="source lang-java linenums">package org.douggschwind.games.cardgames.poker.common;
+
+/**
+ * The strength of a hand is FullHouse, Two Pair, etc. Which each type of
+ * strength, certain information is known such as the Kind of each pair
+ * in a two pair hand. What is missing from HandStrength though, are the
+ * other cards in the player's hand that may be used as a tiebreaker in
+ * the case of certain types of HandStrength, for the following types
+ * of hands : TwoPair, Pair, HighCard, Flush.
+ * @author Doug Gschwind
+ */
+public abstract class HandStrength {
+
+<span class="fc" id="L14">	protected HandStrength() {</span>
+<span class="fc" id="L15">	}</span>
+	
+	public abstract int getHandRank();
+	
+	/**
+	 * This method must be implemented to check that when two hands
+	 * have the same HandRank (e.g. ThreeOfAKind), if the winner
+	 * between the two of them can be determined at that time.
+	 * @param that Must be non-null.
+	 * @return true of false if a clear winner between the two
+	 * can be determined, null if we still do not have enough
+	 * information to declare a winner between the two hands.
+	 */
+	protected abstract Boolean isStrongerThanSameHandRank(HandStrength that);
+	
+	/**
+	 * Determines if this hand beats that hand in terms of HandStrength
+	 * alone. In the case where two hands have the same rank, return null
+	 * as this method does not have enough information to answer the
+	 * question.
+	 * @param that Must be non-null.
+	 * @return true or false if known, null in the case that
+	 * two hands have the same rank.
+	 */
+	public Boolean isStrongerThan(HandStrength that) {
+<span class="fc" id="L40">		int handRankDifference = this.getHandRank() - that.getHandRank();</span>
+		
+<span class="fc bfc" id="L42" title="All 2 branches covered.">		if (handRankDifference != 0) {</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">			return (handRankDifference &lt; 0);</span>
+		}
+		
+		// Matching ranks between the two hands.
+<span class="fc" id="L47">		return isStrongerThanSameHandRank(that);</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

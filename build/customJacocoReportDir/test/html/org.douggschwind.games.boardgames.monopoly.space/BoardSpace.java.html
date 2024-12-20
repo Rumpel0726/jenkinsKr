@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BoardSpace.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">games</a> &gt; <a href="index.source.html" class="el_package">org.douggschwind.games.boardgames.monopoly.space</a> &gt; <span class="el_source">BoardSpace.java</span></div><h1>BoardSpace.java</h1><pre class="source lang-java linenums">package org.douggschwind.games.boardgames.monopoly.space;
+
+import org.douggschwind.games.boardgames.monopoly.DiceRollResult;
+import org.douggschwind.games.boardgames.monopoly.Monopoly;
+import org.douggschwind.games.boardgames.monopoly.Player;
+
+/**
+ * The Monopoly gameboard consists of 40 spaces containing 28 properties (22 colored streets, four railway stations and two utilities), three Chance spaces,
+ * three Community Chest spaces, a Luxury Tax space, an Income Tax space, and the four corner squares: GO, (In) Jail/Just Visiting, Free Parking, and Go to Jail.
+ * 
+ * An instance of this class represents one of those 40 board spaces.
+ * @author Doug Gschwind
+ */
+public abstract class BoardSpace {
+	private final String name;
+	
+<span class="nc" id="L17">	protected BoardSpace(String name) {</span>
+<span class="nc" id="L18">		this.name = name;</span>
+<span class="nc" id="L19">	}</span>
+	
+	public String getName() {
+<span class="nc" id="L22">		return name;</span>
+	}
+	
+	public boolean canBePrivatelyHeld() {
+<span class="nc" id="L26">		return false;</span>
+	}
+	
+	public void resetOwnership() {
+<span class="nc" id="L30">	}</span>
+	
+	public boolean isPubliclyHeld() {
+<span class="nc" id="L33">		return false;</span>
+	}
+	
+	public boolean canPlayerAdvance(Player player, DiceRollResult diceRollResult) {
+<span class="nc" id="L37">		return true;</span>
+	}
+	
+	public void isDepartingThisSpace(Player player) {
+		// If the player can depart this space, they are obviously
+		// not in Jail.
+<span class="nc" id="L43">		player.setInJail(false);</span>
+<span class="nc" id="L44">	}</span>
+	
+	/**
+	 * Takes action now that it is known that the given Player has landed on
+	 * this given instance.
+	 * @param gameInProgress Must be non-null.
+	 * @param hasLanded Must be non-null.
+	 */
+	public void takeAction(Monopoly gameInProgress, Player hasLanded, int playerDiceRollTotal) {
+<span class="nc" id="L53">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

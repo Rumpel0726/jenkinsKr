@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>StandardDeckCardGame.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">games</a> &gt; <a href="index.source.html" class="el_package">org.douggschwind.games.cardgames.common</a> &gt; <span class="el_source">StandardDeckCardGame.java</span></div><h1>StandardDeckCardGame.java</h1><pre class="source lang-java linenums">package org.douggschwind.games.cardgames.common;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
+import org.douggschwind.games.cardgames.common.FrenchSuitedPlayingCard.Kind;
+import org.douggschwind.games.cardgames.poker.common.Flush;
+import org.douggschwind.games.cardgames.poker.common.FourOfAKind;
+import org.douggschwind.games.cardgames.poker.common.FullHouse;
+import org.douggschwind.games.cardgames.poker.common.HandStrength;
+import org.douggschwind.games.cardgames.poker.common.HighCard;
+import org.douggschwind.games.cardgames.poker.common.Pair;
+import org.douggschwind.games.cardgames.poker.common.RoyalFlush;
+import org.douggschwind.games.cardgames.poker.common.Straight;
+import org.douggschwind.games.cardgames.poker.common.StraightFlush;
+import org.douggschwind.games.cardgames.poker.common.ThreeOfAKind;
+import org.douggschwind.games.cardgames.poker.common.TwoPair;
+import org.douggschwind.games.common.DeckOfCards;
+
+/**
+ * An instance of this class assumes one standard deck of 52 total cards,
+ * four suits of 13 distinct cards each.
+ * @author Doug Gschwind
+ */
+public abstract class StandardDeckCardGame {
+	
+	private final DeckOfCards&lt;FrenchSuitedPlayingCard&gt; deck;
+<span class="fc" id="L37">	private final List&lt;Player&gt; players = new ArrayList&lt;&gt;();</span>
+	
+<span class="fc" id="L39">	protected StandardDeckCardGame(DeckOfCards&lt;FrenchSuitedPlayingCard&gt; deck) {</span>
+<span class="fc" id="L40">		this.deck = deck;</span>
+<span class="fc" id="L41">	}</span>
+	
+	public DeckOfCards&lt;FrenchSuitedPlayingCard&gt; getDeck() {
+<span class="fc" id="L44">		return deck;</span>
+	}
+	
+	public void addPlayer(Player toAdd) {
+<span class="pc bpc" id="L48" title="1 of 2 branches missed.">		if (toAdd != null) {</span>
+<span class="fc" id="L49">			players.add(toAdd);</span>
+		}
+<span class="fc" id="L51">	}</span>
+	
+	public final List&lt;Player&gt; getPlayers() {
+<span class="fc" id="L54">		return players;</span>
+	}
+	
+	public final int getNumberPlayers() {
+<span class="fc" id="L58">		return getPlayers().size();</span>
+	}
+	
+	public void newHand() {
+<span class="fc" id="L62">		getDeck().shuffle();</span>
+<span class="fc bfc" id="L63" title="All 2 branches covered.">		for (Player player : getPlayers()) {</span>
+<span class="fc" id="L64">			player.newHand();</span>
+<span class="fc" id="L65">		}</span>
+<span class="fc" id="L66">	}</span>
+	
+	protected abstract int getNumberCardsDealtToEachPlayer();
+	
+	// Each game is allowed to vary how cards are dealt to players.
+	public void dealCardsToPlayers() {
+<span class="fc bfc" id="L72" title="All 2 branches covered.">		for (int i = 1;i &lt;= getNumberCardsDealtToEachPlayer();i++) {</span>
+<span class="fc" id="L73">			getPlayers().forEach(player -&gt; player.acceptDealtCard(getDeck().dealCard()));</span>
+		}
+<span class="fc" id="L75">	}</span>
+	
+	protected final Map&lt;FrenchSuitedPlayingCard.Kind, Integer&gt; determineNumKindOccurrencesInHand(List&lt;FrenchSuitedPlayingCard&gt; playersHand) {
+<span class="fc" id="L78">		Map&lt;FrenchSuitedPlayingCard.Kind, Integer&gt; result = new HashMap&lt;&gt;();</span>
+		
+<span class="fc" id="L80">		Consumer&lt;? super FrenchSuitedPlayingCard&gt; cardVisitor = cardInHand -&gt; {</span>
+<span class="fc" id="L81">			Kind cardKind = cardInHand.getKind();</span>
+<span class="fc" id="L82">			result.put(cardKind, Optional.ofNullable(result.get(cardKind)).map(n -&gt; n + 1).orElse(1));</span>
+<span class="fc" id="L83">		};</span>
+		
+<span class="fc" id="L85">		playersHand.stream().forEach(cardVisitor);</span>
+<span class="fc" id="L86">		return result;</span>
+	}
+	
+	protected final Map&lt;FrenchSuitedPlayingCard.Suit, Integer&gt; determineNumSuitOccurrencesInHand(List&lt;FrenchSuitedPlayingCard&gt; playersHand) {
+<span class="fc" id="L90">		Map&lt;FrenchSuitedPlayingCard.Suit, Integer&gt; result = new HashMap&lt;&gt;();</span>
+		
+<span class="fc" id="L92">		Consumer&lt;? super FrenchSuitedPlayingCard&gt; cardVisitor = cardInHand -&gt; {</span>
+<span class="fc" id="L93">			FrenchSuitedPlayingCard.Suit cardSuit = cardInHand.getSuit();</span>
+<span class="fc" id="L94">			result.put(cardSuit, Optional.ofNullable(result.get(cardSuit)).map(n -&gt; n + 1).orElse(1));</span>
+<span class="fc" id="L95">		};</span>
+		
+<span class="fc" id="L97">		playersHand.stream().forEach(cardVisitor);</span>
+<span class="fc" id="L98">		return result;</span>
+	}
+	
+	protected final Map&lt;FrenchSuitedPlayingCard.Suit, Integer&gt; determineNumSuitOccurrencesInHand(Player player) {
+<span class="fc" id="L102">		return determineNumSuitOccurrencesInHand(player.getHand());</span>
+	}
+	
+	protected final int determineMaximumNumberMatchingKind(Map&lt;FrenchSuitedPlayingCard.Kind, Integer&gt; numKindOccurrences) {
+<span class="fc" id="L106">		final Comparator&lt;Integer&gt; numKindOccurrencesComparator = (n1, n2) -&gt; Integer.compare(n1, n2);</span>
+<span class="fc" id="L107">		Optional&lt;Integer&gt; comparisonResultMax = numKindOccurrences.keySet().stream().map(cardKind -&gt; numKindOccurrences.get(cardKind)).max(numKindOccurrencesComparator);</span>
+<span class="fc" id="L108">		return comparisonResultMax.map(i -&gt; i.intValue()).orElse(0);</span>
+	}
+	
+	protected final Map&lt;Player, List&lt;FrenchSuitedPlayingCard.Kind&gt;&gt; getPlayerSortedDistinctCardKindsMap(Set&lt;Player&gt; players) {
+<span class="fc" id="L112">		Map&lt;Player, List&lt;FrenchSuitedPlayingCard.Kind&gt;&gt; result = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L113">		Consumer&lt;? super Player&gt; computePlayerDistinctSortedCardKinds = player -&gt; {</span>
+<span class="fc" id="L114">			List&lt;Kind&gt; playerSortedDistinctKinds = new ArrayList&lt;&gt;(player.getDistinctCardKinds());</span>
+<span class="fc" id="L115">			Collections.sort(playerSortedDistinctKinds);</span>
+<span class="fc" id="L116">			result.put(player, playerSortedDistinctKinds);</span>
+<span class="fc" id="L117">		};</span>
+<span class="fc" id="L118">		players.stream().forEach(computePlayerDistinctSortedCardKinds);</span>
+<span class="fc" id="L119">		return result;</span>
+	}
+	
+	protected final FrenchSuitedPlayingCard.Kind determineDominantMatchingKind(Map&lt;FrenchSuitedPlayingCard.Kind, Integer&gt; numKindOccurrences, int numDominantMatchesExpected) {
+<span class="fc bfc" id="L123" title="All 2 branches covered.">		Optional&lt;FrenchSuitedPlayingCard.Kind&gt; foundCardKind = numKindOccurrences.keySet().stream().filter(cardKind -&gt; numKindOccurrences.get(cardKind) == numDominantMatchesExpected).findFirst();</span>
+<span class="fc" id="L124">		return foundCardKind.map(kind -&gt; kind).orElse(null);</span>
+	}
+	
+	protected final Pair determinePlayerHandPair(Map&lt;FrenchSuitedPlayingCard.Kind, Integer&gt; numKindOccurrences) {
+<span class="fc bfc" id="L128" title="All 2 branches covered.">		Optional&lt;FrenchSuitedPlayingCard.Kind&gt; foundCardKind = numKindOccurrences.keySet().stream().filter(cardKind -&gt; numKindOccurrences.get(cardKind) == 2).findFirst();</span>
+<span class="fc" id="L129">		return foundCardKind.map(kind -&gt; new Pair(kind)).orElse(null);</span>
+	}
+	
+	private HandStrength determinePlayerHandStrengthNoMatchingKinds(Player player) {
+<span class="fc" id="L133">		Map&lt;FrenchSuitedPlayingCard.Suit, Integer&gt; numSuitOccurrences = determineNumSuitOccurrencesInHand(player);</span>
+		// Make a copy of the player's hand so that we leave the players hand in
+		// its originally dealt form.
+<span class="fc" id="L136">		List&lt;FrenchSuitedPlayingCard&gt; playerHand = new ArrayList&lt;&gt;(player.getHand());</span>
+<span class="fc" id="L137">		Collections.sort(playerHand);</span>
+<span class="fc" id="L138">		FrenchSuitedPlayingCard lowCard = playerHand.get(4);</span>
+<span class="fc" id="L139">		FrenchSuitedPlayingCard highCard = playerHand.get(0);</span>
+<span class="fc" id="L140">		FrenchSuitedPlayingCard secondHighestCard = playerHand.get(1);</span>
+<span class="fc" id="L141">		int lowToHighDistance = FrenchSuitedPlayingCard.Kind.computeDistance(lowCard.getKind(), highCard.getKind());</span>
+<span class="fc bfc" id="L142" title="All 2 branches covered.">		if (numSuitOccurrences.size() == 1) {</span>
+			// Player has a flush, straight flush, or royal flush
+<span class="fc bfc" id="L144" title="All 2 branches covered.">			if (lowToHighDistance == 4) {</span>
+				// Player has a straight flush or a royal flush
+<span class="fc bfc" id="L146" title="All 2 branches covered.">				return highCard.isAce() ? new RoyalFlush() : new StraightFlush(highCard.getKind());</span>
+<span class="fc bfc" id="L147" title="All 2 branches covered.">			} else if (highCard.isAce()) {</span>
+<span class="fc" id="L148">				lowToHighDistance = FrenchSuitedPlayingCard.Kind.computeDistance(lowCard.getKind(), secondHighestCard.getKind());</span>
+<span class="fc bfc" id="L149" title="All 2 branches covered.">				if ((lowToHighDistance == 3) &amp;&amp;</span>
+<span class="fc bfc" id="L150" title="All 2 branches covered.">					(lowCard.getKind() == FrenchSuitedPlayingCard.Kind.Two)) {</span>
+					// Ace low straight flush
+<span class="fc" id="L152">					return new StraightFlush(secondHighestCard.getKind());</span>
+				}
+			}
+			
+			// Player has a flush
+<span class="fc" id="L157">			return new Flush(highCard.getKind());</span>
+		} else {
+			// Player has a high card hand or a straight
+<span class="fc bfc" id="L160" title="All 2 branches covered.">			if (lowToHighDistance == 4) {</span>
+<span class="fc" id="L161">				return new Straight(highCard.getKind());</span>
+<span class="fc bfc" id="L162" title="All 2 branches covered.">			} else if (highCard.isAce()) {</span>
+<span class="fc" id="L163">				lowToHighDistance = FrenchSuitedPlayingCard.Kind.computeDistance(lowCard.getKind(), secondHighestCard.getKind());</span>
+<span class="fc bfc" id="L164" title="All 2 branches covered.">				if ((lowToHighDistance == 3) &amp;&amp;</span>
+<span class="pc bpc" id="L165" title="1 of 2 branches missed.">					(lowCard.getKind() == FrenchSuitedPlayingCard.Kind.Two)) {</span>
+					// Ace low straight
+<span class="fc" id="L167">					return new Straight(secondHighestCard.getKind());</span>
+				}
+			}
+<span class="fc" id="L170">			return new HighCard(highCard.getKind());</span>
+		}
+	}
+	
+	protected final HandStrength determinePlayerHandStrengthThreeDistinctKindsInHand(int maxNumberMatchingKind, Map&lt;FrenchSuitedPlayingCard.Kind, Integer&gt; numKindOccurrences) {
+<span class="fc bfc" id="L175" title="All 2 branches covered.">		if (maxNumberMatchingKind == 3) {</span>
+			// Player has three of a kind.
+<span class="fc" id="L177">			return new ThreeOfAKind(determineDominantMatchingKind(numKindOccurrences, 3));</span>
+		} else {
+			// Player has two pair. Filter out those kinds that are paired in the players hand.
+<span class="fc bfc" id="L180" title="All 2 branches covered.">			List&lt;FrenchSuitedPlayingCard.Kind&gt; pairedKinds = numKindOccurrences.keySet().stream().filter(cardKind -&gt; numKindOccurrences.get(cardKind) == 2).collect(Collectors.toList());</span>
+<span class="fc" id="L181">			FrenchSuitedPlayingCard.Kind pair1 = pairedKinds.get(0);</span>
+<span class="fc" id="L182">			FrenchSuitedPlayingCard.Kind pair2 = pairedKinds.get(1);</span>
+<span class="fc bfc" id="L183" title="All 2 branches covered.">			return (pair1.hasHigherRank(pair2)) ? new TwoPair(pair1, pair2) : new TwoPair(pair2, pair1);</span>
+		}
+	}
+	
+	/**
+	 * This method determines the strength of the players hand ignoring the possibility
+	 * of any wild cards.
+	 * @param player Must be non-null.
+	 * @return Will be non-null.
+	 */
+	public HandStrength determinePlayerHandStrength(Player player) {
+<span class="fc" id="L194">		Map&lt;FrenchSuitedPlayingCard.Kind, Integer&gt; numKindOccurrences = determineNumKindOccurrencesInHand(player.getHand());</span>
+		
+<span class="fc bfc" id="L196" title="All 2 branches covered.">		if (numKindOccurrences.size() == getNumberCardsDealtToEachPlayer()) {</span>
+			// Player has no matching kinds, but instead could have a
+			// Straight, Flush, Straight Flush, Royal Flush, or simply
+			// a HighCard hand.
+<span class="fc" id="L200">			return determinePlayerHandStrengthNoMatchingKinds(player);</span>
+<span class="fc bfc" id="L201" title="All 2 branches covered.">		} else if (numKindOccurrences.size() == (getNumberCardsDealtToEachPlayer() - 1)) {</span>
+			// With four distinct kind cards out of five, the player
+			// simply has a Pair.
+<span class="fc" id="L204">			return determinePlayerHandPair(numKindOccurrences);</span>
+		}
+		
+<span class="fc" id="L207">		int maxNumberMatchingKind = determineMaximumNumberMatchingKind(numKindOccurrences);</span>
+<span class="fc bfc" id="L208" title="All 2 branches covered.">		if (numKindOccurrences.size() == 3) {</span>
+			// Player could have three of a kind or two pair.
+<span class="fc" id="L210">			return determinePlayerHandStrengthThreeDistinctKindsInHand(maxNumberMatchingKind, numKindOccurrences);</span>
+		}
+		
+		// Player has a four of a kind or a full house.
+<span class="fc bfc" id="L214" title="All 2 branches covered.">		if (maxNumberMatchingKind == 4) {</span>
+			// Player has four of a kind
+<span class="fc" id="L216">			return new FourOfAKind(determineDominantMatchingKind(numKindOccurrences, 4));</span>
+		} else {
+			// Player has a full house
+<span class="fc" id="L219">			return new FullHouse(determineDominantMatchingKind(numKindOccurrences, 3));</span>
+		}
+	}
+	
+	public final Map&lt;Player, HandStrength&gt; determinePlayerHandsStrength() {
+<span class="fc" id="L224">		Map&lt;Player, HandStrength&gt; result = new HashMap&lt;&gt;();</span>
+		
+		// Since HandStrength computation is a little involved, lets
+		// cache the result for future reference in this method.
+<span class="fc" id="L228">		getPlayers().forEach(player -&gt; result.put(player, determinePlayerHandStrength(player)));</span>
+		
+<span class="fc" id="L230">		return result;</span>
+	}
+	
+	/**
+	 * Determines the Player or Players that have the strongest hand.
+	 * @param playerHandStrengths Must be non-null.
+	 * @return The Set will be non-null and non-empty, and most often only
+	 * house a single Player. However, there are times when hand rank alone
+	 * cannot be used to determine the winner of a hand, such as when the
+	 * two best hands are a Ten high Straight.
+	 */
+	protected final Set&lt;Player&gt; determineLeadingPlayersBasedUponHandRankAlone(Map&lt;Player, HandStrength&gt; playerHandStrengths) {
+		// Lets make a quick first pass attempting to identify the winner
+		// based upon HandRank alone.
+<span class="fc" id="L244">		Set&lt;Player&gt; result = new HashSet&lt;&gt;();</span>
+		
+<span class="fc" id="L246">		Consumer&lt;? super Player&gt; playerVisitor = currentPlayer -&gt; {</span>
+<span class="fc" id="L247">			HandStrength playerHandStrength = playerHandStrengths.get(currentPlayer);</span>
+<span class="fc bfc" id="L248" title="All 2 branches covered.">			if (result.isEmpty()) {</span>
+<span class="fc" id="L249">				result.add(currentPlayer);</span>
+			} else {
+				// Only need to compare against the first leading player. If there are two
+				// or more leading players at a given time, they all have the same hand rank.
+<span class="fc" id="L253">				Player leadingPlayer = result.iterator().next();</span>
+<span class="fc" id="L254">				HandStrength leadingPlayerHandStrength = playerHandStrengths.get(leadingPlayer);</span>
+<span class="fc" id="L255">				Boolean playerBeatsLeadingPlayer = playerHandStrength.isStrongerThan(leadingPlayerHandStrength);</span>
+<span class="fc" id="L256">				boolean currentPlayerNowALeadingPlayer = false;</span>
+<span class="fc bfc" id="L257" title="All 2 branches covered.">				if (playerBeatsLeadingPlayer != null) {</span>
+<span class="fc bfc" id="L258" title="All 2 branches covered.">					if (playerBeatsLeadingPlayer.booleanValue()) {</span>
+<span class="fc" id="L259">						result.clear();</span>
+<span class="fc" id="L260">						currentPlayerNowALeadingPlayer = true;</span>
+					}
+				} else {
+					// The current Player has tied the leading Player(s)!
+<span class="fc" id="L264">					currentPlayerNowALeadingPlayer = true;</span>
+				}
+				
+<span class="fc bfc" id="L267" title="All 2 branches covered.">				if (currentPlayerNowALeadingPlayer) {</span>
+<span class="fc" id="L268">					result.add(currentPlayer);</span>
+				}
+			}
+<span class="fc" id="L271">		};</span>
+		
+<span class="fc" id="L273">		playerHandStrengths.keySet().stream().forEach(playerVisitor);</span>
+<span class="fc" id="L274">		return result;</span>
+	}
+	
+	/**
+	 * Each game must implement this as certain hands in certain games are unique,
+	 * but not necessarily in all other games. e.g. In Western, a Four of a Kind
+	 * hand is unique enough, the other card in the player's hand will not be used
+	 * to determine the winner of a given hand. In DeucesWild, two players can have
+	 * the same Four of a Kind, so the fifth card in each player's hand in that case
+	 * will be used to attempt to determine which player won the hand.
+	 * @param playerHandStrength Expected to be non-null.
+	 * @return true if so, false otherwise.
+	 */
+	protected abstract boolean canPlayersHandHoldTiebreakerCards(HandStrength playerHandStrength);
+	
+	/**
+	 * Determine the Card.Kind instances in which every player holds in their hand.
+	 * @param playerSortedDistinctCardKindsMap
+	 * @return
+	 */
+	private Set&lt;FrenchSuitedPlayingCard.Kind&gt; getDistinctGameCommonCardKinds(Map&lt;Player, List&lt;FrenchSuitedPlayingCard.Kind&gt;&gt; playerSortedDistinctCardKindsMap) {
+<span class="fc" id="L295">		final Set&lt;FrenchSuitedPlayingCard.Kind&gt; result = new HashSet&lt;&gt;();</span>
+		
+<span class="fc" id="L297">		Consumer&lt;? super Player&gt; playerVisitor = player -&gt; {</span>
+<span class="fc" id="L298">			List&lt;Kind&gt; playerSortedDistinctCardKinds = playerSortedDistinctCardKindsMap.get(player);</span>
+<span class="fc bfc" id="L299" title="All 2 branches covered.">			if (result.isEmpty()) {</span>
+<span class="fc" id="L300">				result.addAll(playerSortedDistinctCardKinds);</span>
+			} else {
+<span class="fc" id="L302">				result.retainAll(playerSortedDistinctCardKinds);</span>
+			}
+<span class="fc" id="L304">		};</span>
+		
+<span class="fc" id="L306">		playerSortedDistinctCardKindsMap.keySet().forEach(playerVisitor);</span>
+<span class="fc" id="L307">		return result;</span>
+	}
+	
+	/**
+	 * Determines the List of Card.Kind instances for each Player that exist in the Player's
+	 * hand that are not cards found in common among all Players in the argument set.
+	 * @param players
+	 * @return
+	 */
+	private Map&lt;Player, List&lt;FrenchSuitedPlayingCard.Kind&gt;&gt; getCommonEliminatedSortedPlayerCardKindsMap(Set&lt;Player&gt; players) {
+<span class="fc" id="L317">		Map&lt;Player, List&lt;FrenchSuitedPlayingCard.Kind&gt;&gt; result = getPlayerSortedDistinctCardKindsMap(players);</span>
+<span class="fc" id="L318">		Set&lt;FrenchSuitedPlayingCard.Kind&gt; distinctGameCommonCardKinds = getDistinctGameCommonCardKinds(result);</span>
+<span class="fc" id="L319">		players.forEach(player -&gt; result.get(player).removeAll(distinctGameCommonCardKinds));</span>
+<span class="fc" id="L320">		return result;</span>
+	}
+	
+	/**
+	 * Determine the winners of the hand. There will always be at least one,
+	 * but in rare cases, two or more players could have equally strong hands
+	 * in which case those matching hands tie.
+	 * @return Will be non-null, and contain at least one Player.
+	 */
+	public final Set&lt;Player&gt; determineWinners() {
+<span class="fc" id="L330">		Map&lt;Player, HandStrength&gt; playerHandStrengths = determinePlayerHandsStrength();</span>
+<span class="fc" id="L331">		Set&lt;Player&gt; leadingPlayers = determineLeadingPlayersBasedUponHandRankAlone(playerHandStrengths);</span>
+		
+		// If at this point only one player remains, they are the clear winner.
+<span class="fc bfc" id="L334" title="All 2 branches covered.">		if (leadingPlayers.size() == 1) {</span>
+<span class="fc" id="L335">			return leadingPlayers;</span>
+		}
+		
+<span class="fc" id="L338">		Player aLeadingPLayer = playerHandStrengths.keySet().iterator().next();</span>
+<span class="fc" id="L339">		HandStrength aLeadingPlayerHandStrength = playerHandStrengths.get(aLeadingPLayer);</span>
+<span class="fc bfc" id="L340" title="All 2 branches covered.">		if (!canPlayersHandHoldTiebreakerCards(aLeadingPlayerHandStrength)) {</span>
+			// Here, two or more players have a hand that have matching strength,
+			// but comparing individual cards beyond hand strength
+			// (e.g. 10 high straight flush in Spades) will not result in a
+			// conclusive choice of a winner. Each of the players are then 
+			// equal winners.
+<span class="fc" id="L346">			return leadingPlayers;</span>
+		}
+		
+		// Otherwise, we have two or more players with the same hand rank (e.g. two pair)
+		// that need to be evaluated further to see which one has the winning hand. The
+		// only time this can happen is when more than one player has :
+		// two pair, one pair, flush, or high card.
+<span class="fc" id="L353">		Map&lt;Player, List&lt;FrenchSuitedPlayingCard.Kind&gt;&gt; playerSortedDistinctCardKindsMap = getCommonEliminatedSortedPlayerCardKindsMap(leadingPlayers);</span>
+<span class="fc" id="L354">		Player aLeadingPlayer = playerSortedDistinctCardKindsMap.keySet().iterator().next();</span>
+<span class="fc" id="L355">		List&lt;FrenchSuitedPlayingCard.Kind&gt; aLeadingPlayerUniqueDistinctCardKinds = playerSortedDistinctCardKindsMap.get(aLeadingPlayer);</span>
+<span class="fc bfc" id="L356" title="All 2 branches covered.">		if (aLeadingPlayerUniqueDistinctCardKinds.isEmpty()) {</span>
+			// Here, the cards in the players hands that do not contribute to 
+			// HandStrength still match. For example, two players each with two
+			// pair (say Aces and Eights), with a Ten. They match in entirety,
+			// so both Players are winners.
+<span class="fc" id="L361">			return leadingPlayers;</span>
+		}
+		
+		// At this point, each player in playerSortedDistinctCardKindsMap has
+		// the same number of elements in its List&lt;Card.Kind&gt;.
+<span class="fc" id="L366">		Set&lt;Player&gt; eliminatedPlayers = new HashSet&lt;Player&gt;();</span>
+<span class="fc bfc" id="L367" title="All 2 branches covered.">		for (int cardIndex = 0;cardIndex &lt; aLeadingPlayerUniqueDistinctCardKinds.size();cardIndex++) {</span>
+<span class="fc" id="L368">			FrenchSuitedPlayingCard.Kind cardKindLeadingAtIndex = null;</span>
+<span class="fc" id="L369">			Player playerContributingLeadingCardKind = null;</span>
+<span class="fc bfc" id="L370" title="All 2 branches covered.">			for (Player player : playerSortedDistinctCardKindsMap.keySet()) {</span>
+<span class="fc bfc" id="L371" title="All 2 branches covered.">				if (eliminatedPlayers.contains(player)) {</span>
+<span class="fc" id="L372">					continue; // to next player</span>
+				}
+				
+<span class="fc" id="L375">				List&lt;FrenchSuitedPlayingCard.Kind&gt; uniqueDistinctPlayerCardKinds = playerSortedDistinctCardKindsMap.get(player);</span>
+<span class="fc" id="L376">				Kind playerCardKindAtIndex = uniqueDistinctPlayerCardKinds.get(cardIndex);</span>
+<span class="fc bfc" id="L377" title="All 2 branches covered.">				if (cardKindLeadingAtIndex == null) {</span>
+<span class="fc" id="L378">					cardKindLeadingAtIndex = playerCardKindAtIndex;</span>
+<span class="fc" id="L379">					playerContributingLeadingCardKind = player;</span>
+<span class="fc" id="L380">					continue; // to next player</span>
+				}
+				
+<span class="fc" id="L383">				Boolean leadingKindBeatsPlayersKind = cardKindLeadingAtIndex.hasHigherRank(playerCardKindAtIndex);</span>
+<span class="fc bfc" id="L384" title="All 2 branches covered.">				if (leadingKindBeatsPlayersKind == null) {</span>
+					// Both players had same Kind of card
+<span class="fc" id="L386">					continue; // to next player</span>
+<span class="fc bfc" id="L387" title="All 2 branches covered.">				} else if (leadingKindBeatsPlayersKind.booleanValue()) {</span>
+<span class="fc" id="L388">					eliminatedPlayers.add(player);</span>
+				} else {
+<span class="fc" id="L390">					eliminatedPlayers.add(playerContributingLeadingCardKind);</span>
+<span class="fc" id="L391">					cardKindLeadingAtIndex = playerCardKindAtIndex;</span>
+<span class="fc" id="L392">					playerContributingLeadingCardKind = player;</span>
+				}
+<span class="fc" id="L394">			}</span>
+		}
+		
+<span class="fc" id="L397">		leadingPlayers.removeAll(eliminatedPlayers);</span>
+<span class="fc" id="L398">		return leadingPlayers;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

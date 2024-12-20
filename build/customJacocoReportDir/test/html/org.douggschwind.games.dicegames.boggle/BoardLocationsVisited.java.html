@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BoardLocationsVisited.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">games</a> &gt; <a href="index.source.html" class="el_package">org.douggschwind.games.dicegames.boggle</a> &gt; <span class="el_source">BoardLocationsVisited.java</span></div><h1>BoardLocationsVisited.java</h1><pre class="source lang-java linenums">package org.douggschwind.games.dicegames.boggle;
+
+import java.util.Arrays;
+
+/**
+ * Records the board locations that have been visited. A board location (i.e. die in the game board) is visited when
+ * the letter on the die is considered for a part of a word being built. Since a given die can only be used once
+ * within a valid word in the game of Boggle, this logic is required.
+ *
+ * Allows an instance of this class to be easily cloned.
+ * @author Doug Gschwind
+ */
+public class BoardLocationsVisited implements Cloneable {
+    private boolean[][] state;
+
+<span class="fc" id="L16">    BoardLocationsVisited(int gameBoardSize) {</span>
+<span class="fc" id="L17">        state = new boolean[gameBoardSize][];</span>
+<span class="fc bfc" id="L18" title="All 2 branches covered.">        for (int row = 0;row &lt; gameBoardSize;row++) {</span>
+<span class="fc" id="L19">            state[row] = new boolean[gameBoardSize];</span>
+        }
+<span class="fc" id="L21">    }</span>
+
+    boolean hasBeenVisited(int row, int column) {
+<span class="fc" id="L24">        return state[row][column];</span>
+    }
+
+    void markVisited(int row, int column) {
+<span class="fc" id="L28">        state[row][column] = true;</span>
+<span class="fc" id="L29">    }</span>
+
+    @Override
+    public BoardLocationsVisited clone() {
+<span class="fc" id="L33">        BoardLocationsVisited clone = null;</span>
+        try {
+<span class="fc" id="L35">            clone = (BoardLocationsVisited) super.clone();</span>
+<span class="fc" id="L36">            int boardSize = this.state.length;</span>
+<span class="fc" id="L37">            clone.state = Arrays.copyOf(this.state, boardSize);</span>
+<span class="fc bfc" id="L38" title="All 2 branches covered.">            for (int row = 0;row &lt; boardSize;row++) {</span>
+<span class="fc" id="L39">                clone.state[row] = Arrays.copyOf(this.state[row], boardSize);</span>
+            }
+<span class="nc" id="L41">        } catch (CloneNotSupportedException ignored) {</span>
+<span class="fc" id="L42">        }</span>
+
+<span class="fc" id="L44">        return clone;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

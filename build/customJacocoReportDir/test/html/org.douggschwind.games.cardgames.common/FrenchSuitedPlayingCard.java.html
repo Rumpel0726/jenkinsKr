@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FrenchSuitedPlayingCard.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">games</a> &gt; <a href="index.source.html" class="el_package">org.douggschwind.games.cardgames.common</a> &gt; <span class="el_source">FrenchSuitedPlayingCard.java</span></div><h1>FrenchSuitedPlayingCard.java</h1><pre class="source lang-java linenums">package org.douggschwind.games.cardgames.common;
+
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.douggschwind.games.common.AbstractCard;
+
+/**
+ * An instance of the Card class represents a card from a standard deck of 52 cards, each
+ * having a French suit (i.e. Spades, Clubs, Hearts, Diamonds) and a kind (e.g. Ace).
+ * @author Doug Gschwind
+ */
+public class FrenchSuitedPlayingCard implements AbstractCard, Comparable&lt;FrenchSuitedPlayingCard&gt; {
+	
+<span class="fc" id="L17">	public enum Kind implements Comparator&lt;Kind&gt; {</span>
+<span class="fc" id="L18">		Ace(1, &quot;A&quot;),</span>
+<span class="fc" id="L19">		King(2, &quot;K&quot;),</span>
+<span class="fc" id="L20">		Queen(3, &quot;Q&quot;),</span>
+<span class="fc" id="L21">		Jack(4, &quot;J&quot;),</span>
+<span class="fc" id="L22">		Ten(5, &quot;10&quot;),</span>
+<span class="fc" id="L23">		Nine(6, &quot;9&quot;),</span>
+<span class="fc" id="L24">		Eight(7, &quot;8&quot;),</span>
+<span class="fc" id="L25">		Seven(8, &quot;7&quot;),</span>
+<span class="fc" id="L26">		Six(9, &quot;6&quot;),</span>
+<span class="fc" id="L27">		Five(10, &quot;5&quot;),</span>
+<span class="fc" id="L28">		Four(11, &quot;4&quot;),</span>
+<span class="fc" id="L29">		Three(12, &quot;3&quot;),</span>
+<span class="fc" id="L30">		Two(13, &quot;2&quot;);</span>
+		
+		private final int rank;
+		private final String abbreviation;
+		
+		/**
+		 * Determines the distance in terms of number of kinds that fall
+		 * between the two argument kinds. e.g. The distance between a
+		 * Six and a Seven is one, between a Six and Four is two, etc.
+		 * @param kind1 Must be non-null.
+		 * @param kind2 Must be non-null.
+		 * @return Will be non-negative, but can be zero if the two
+		 * arguments are in fact the same Kind.
+		 */
+		public static int computeDistance(Kind kind1, Kind kind2) {
+<span class="fc" id="L45">			return Math.abs(kind1.getRank() - kind2.getRank());</span>
+		}
+		
+<span class="fc" id="L48">		private Kind(int rank, String abbreviation) {</span>
+<span class="fc" id="L49">			this.rank = rank;</span>
+<span class="fc" id="L50">			this.abbreviation = abbreviation;</span>
+<span class="fc" id="L51">		}</span>
+		
+		protected int getRank() {
+<span class="fc" id="L54">			return rank;</span>
+		}
+		
+		public String getAbbreviation() {
+<span class="nc" id="L58">			return abbreviation;</span>
+		}
+		
+		/**
+		 * Determines if this Kind instance has a higher rank that Kind instance.
+		 * @param that Must be non-null.
+		 * @return true or false if the question can be answered
+		 * conclusively, null otherwise.
+		 */
+		public Boolean hasHigherRank(Kind that) {
+<span class="fc" id="L68">			int rankDifference = this.rank - that.rank;</span>
+<span class="fc bfc" id="L69" title="All 4 branches covered.">			return (rankDifference != 0) ? (rankDifference &lt; 0) : null;</span>
+		}
+		
+		/**
+		 * Determines if this Kind instance has a lower rank that Kind instance.
+		 * @param that Must be non-null.
+		 * @return true or false if the question can be answered
+		 * conclusively, null otherwise.
+		 */
+		public Boolean hasLowerRank(Kind that) {
+<span class="fc" id="L79">			int rankDifference = this.rank - that.rank;</span>
+<span class="fc bfc" id="L80" title="All 4 branches covered.">			return (rankDifference != 0) ? (rankDifference &gt; 0) : null;</span>
+		}
+		
+		public Kind getNextHigherRankingKind() {
+<span class="pc bpc" id="L84" title="6 of 12 branches missed.">			switch (this) {</span>
+				case Ace:
+				case King:
+<span class="nc" id="L87">					return Ace;</span>
+				case Queen:
+<span class="fc" id="L89">					return King;</span>
+				case Jack:
+<span class="fc" id="L91">					return Queen;</span>
+				case Ten:
+<span class="fc" id="L93">					return Jack;</span>
+				case Nine:
+<span class="fc" id="L95">					return Ten;</span>
+				case Eight:
+<span class="fc" id="L97">					return Nine;</span>
+				case Seven:
+<span class="fc" id="L99">					return Eight;</span>
+				case Six:
+<span class="nc" id="L101">					return Seven;</span>
+				case Five:
+<span class="nc" id="L103">					return Six;</span>
+				case Four:
+<span class="nc" id="L105">					return Five;</span>
+				case Three:
+<span class="nc" id="L107">					return Four;</span>
+				case Two:
+				default:
+<span class="nc" id="L110">					return Three;</span>
+			}
+		}
+		
+		/**
+		 * Sorts Kinds into descending order.
+		 */
+		@Override
+		public int compare(FrenchSuitedPlayingCard.Kind kind1, FrenchSuitedPlayingCard.Kind kind2) {
+<span class="nc" id="L119">			return kind1.getRank() - kind2.getRank();</span>
+		}
+	}
+	
+<span class="fc" id="L123">	public enum Suit {</span>
+<span class="fc" id="L124">		Spades(&quot;s&quot;),</span>
+<span class="fc" id="L125">		Clubs(&quot;c&quot;),</span>
+<span class="fc" id="L126">		Hearts(&quot;h&quot;),</span>
+<span class="fc" id="L127">		Diamonds(&quot;d&quot;);</span>
+		
+		private final String abbreviation;
+		
+<span class="fc" id="L131">		private Suit(String abbreviation) {</span>
+<span class="fc" id="L132">			this.abbreviation = abbreviation;</span>
+<span class="fc" id="L133">		}</span>
+		
+		public String getAbbreviation() {
+<span class="nc" id="L136">			return abbreviation;</span>
+		}
+	}
+	
+	private final Kind kind;
+	private final Suit suit;
+	
+	public static Set&lt;FrenchSuitedPlayingCard.Kind&gt; getDistinctCardKinds(List&lt;FrenchSuitedPlayingCard&gt; cards) {
+<span class="fc" id="L144">		Set&lt;FrenchSuitedPlayingCard.Kind&gt; result = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L145">		cards.forEach(cardInHand -&gt; result.add(cardInHand.getKind()));</span>
+<span class="fc" id="L146">		return result;</span>
+	}
+	
+<span class="fc" id="L149">	public FrenchSuitedPlayingCard(Kind kind, Suit suit) {</span>
+<span class="fc" id="L150">		this.kind = kind;</span>
+<span class="fc" id="L151">		this.suit = suit;</span>
+<span class="fc" id="L152">	}</span>
+
+	public Kind getKind() {
+<span class="fc" id="L155">		return kind;</span>
+	}
+
+	public Suit getSuit() {
+<span class="fc" id="L159">		return suit;</span>
+	}
+	
+	@Override
+	public boolean equals(Object wideThat) {
+		// Use equals by state value implementation here since Card
+		// is a ValueObject.
+<span class="pc bpc" id="L166" title="1 of 2 branches missed.">		if (this == wideThat) {</span>
+<span class="nc" id="L167">			return true;</span>
+<span class="pc bpc" id="L168" title="1 of 2 branches missed.">		} else if (!this.getClass().equals(wideThat.getClass())) {</span>
+<span class="nc" id="L169">			return false;</span>
+		}
+		
+<span class="fc" id="L172">		FrenchSuitedPlayingCard that = (FrenchSuitedPlayingCard) wideThat;</span>
+		
+<span class="fc bfc" id="L174" title="All 4 branches covered.">		return this.getKind().equals(that.getKind()) &amp;&amp; this.getSuit().equals(that.getSuit());</span>
+	}
+	
+	@Override
+	public int hashCode() {
+<span class="fc" id="L179">		return getKind().hashCode() + getSuit().hashCode();</span>
+	}
+	
+	public boolean isAce() {
+<span class="fc" id="L183">		return Kind.Ace.equals(getKind());</span>
+	}
+	
+	public boolean isKing() {
+<span class="nc" id="L187">		return Kind.King.equals(getKind());</span>
+	}
+	
+	public boolean isQueen() {
+<span class="nc" id="L191">		return Kind.Queen.equals(getKind());</span>
+	}
+	
+	public boolean isJack() {
+<span class="fc" id="L195">		return Kind.Jack.equals(getKind());</span>
+	}
+	
+	public boolean isJackOrBetter() {
+<span class="nc bnc" id="L199" title="All 8 branches missed.">		return (isAce() || isKing() || isQueen() || isJack());</span>
+	}
+
+	@Override
+	public int compareTo(FrenchSuitedPlayingCard that) {
+<span class="fc" id="L204">		return this.getKind().getRank() - that.getKind().getRank();</span>
+	}
+	
+	@Override
+	public String toString() {
+<span class="nc" id="L209">		return getKind().getAbbreviation() + getSuit().getAbbreviation();</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

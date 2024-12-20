@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DeckFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">games</a> &gt; <a href="index.source.html" class="el_package">org.douggschwind.games.boardgames.monopoly.actioncard</a> &gt; <span class="el_source">DeckFactory.java</span></div><h1>DeckFactory.java</h1><pre class="source lang-java linenums">package org.douggschwind.games.boardgames.monopoly.actioncard;
+
+import org.douggschwind.games.boardgames.monopoly.actioncard.AdvanceToCard.Location;
+import org.douggschwind.games.common.DeckOfCards;
+
+/**
+ * Supports the creation of the deck of ActionCards used for the Community Chest deck of cards,
+ * or the deck of ActionCards used for the Chance deck of cards.
+ * @author Doug Gschwind
+ */
+<span class="nc" id="L11">public class DeckFactory {</span>
+	
+	public static DeckOfCards&lt;ActionCard&gt; createCommunityChestDeck() {
+<span class="fc" id="L14">		DeckOfCards&lt;ActionCard&gt; result = new DeckOfCards&lt;&gt;();</span>
+<span class="fc" id="L15">		result.addCard(new AdvanceToCard(Location.Go, true));</span>
+<span class="fc" id="L16">		result.addCard(new PlayerCreditCard(&quot;Bank error in your favor&quot;, 200));</span>
+<span class="fc" id="L17">		result.addCard(new PlayerDebitCard(&quot;Doctor's fee&quot;, 50));</span>
+<span class="fc" id="L18">		result.addCard(new GetOutOfJailFreeCard());</span>
+<span class="fc" id="L19">		result.addCard(new AdvanceToCard(Location.Jail, false));</span>
+<span class="fc" id="L20">		result.addCard(new PerOpponentCreditCard(&quot;Grand Opera Opening&quot;, 50));</span>
+<span class="fc" id="L21">		result.addCard(new PerOpponentCreditCard(&quot;Its your birthday!&quot;, 10));</span>
+<span class="fc" id="L22">		result.addCard(new PlayerCreditCard(&quot;Income Tax Refund&quot;, 20));</span>
+<span class="fc" id="L23">		result.addCard(new PlayerCreditCard(&quot;Life Insurance Matures&quot;, 100));</span>
+<span class="fc" id="L24">		result.addCard(new PlayerDebitCard(&quot;Pay Hospital&quot;, 100));</span>
+<span class="fc" id="L25">		result.addCard(new PlayerDebitCard(&quot;Pay School Tax&quot;, 150));</span>
+<span class="fc" id="L26">		result.addCard(new PlayerCreditCard(&quot;Receive for Services&quot;, 25));</span>
+<span class="fc" id="L27">		result.addCard(new PerPropertyDebitCard(&quot;You are assessed for street repairs&quot;, 40, 115));</span>
+<span class="fc" id="L28">		result.addCard(new PlayerCreditCard(&quot;You have won second place in a beauty contest&quot;, 10));</span>
+<span class="fc" id="L29">		result.addCard(new PlayerCreditCard(&quot;You inherit&quot;, 100));</span>
+<span class="fc" id="L30">		result.addCard(new PlayerCreditCard(&quot;From sale of Stock&quot;, 45));</span>
+<span class="fc" id="L31">		result.addCard(new PlayerCreditCard(&quot;Xmas fund matures&quot;, 100));</span>
+<span class="fc" id="L32">		return result;</span>
+	}
+	
+	public static DeckOfCards&lt;ActionCard&gt; createChanceDeck() {
+<span class="fc" id="L36">		DeckOfCards&lt;ActionCard&gt; result = new DeckOfCards&lt;&gt;();</span>
+<span class="fc" id="L37">		result.addCard(new AdvanceToCard(Location.Go, true));</span>
+<span class="fc" id="L38">		result.addCard(new AdvanceToCard(Location.IllinoisAve, true));</span>
+<span class="fc" id="L39">		result.addCard(new AdvanceToCard(Location.StCharlesPlace, true));</span>
+<span class="fc" id="L40">		result.addCard(new AdvanceToCard(Location.NearestUtility, true));</span>
+<span class="fc" id="L41">		result.addCard(new AdvanceToCard(Location.NearestRailroad, true));</span>
+<span class="fc" id="L42">		result.addCard(new PlayerCreditCard(&quot;Bank Dividend&quot;, 50));</span>
+<span class="fc" id="L43">		result.addCard(new GetOutOfJailFreeCard());</span>
+<span class="fc" id="L44">		result.addCard(new AdvanceToCard(Location.GoBackThreeSpaces, false));</span>
+<span class="fc" id="L45">		result.addCard(new AdvanceToCard(Location.Jail, false));</span>
+<span class="fc" id="L46">		result.addCard(new PerPropertyDebitCard(&quot;Make general repairs on all your property&quot;, 25, 100));</span>
+<span class="fc" id="L47">		result.addCard(new PlayerDebitCard(&quot;Poor Tax&quot;, 15));</span>
+<span class="fc" id="L48">		result.addCard(new AdvanceToCard(Location.ReadingRailroad, true));</span>
+<span class="fc" id="L49">		result.addCard(new AdvanceToCard(Location.Boardwalk, true));</span>
+<span class="fc" id="L50">		result.addCard(new PerOpponentDebitCard(&quot;You have been elected Chairman of the Board&quot;, 50));</span>
+<span class="fc" id="L51">		result.addCard(new PlayerCreditCard(&quot;Building and Loan matures&quot;, 150));</span>
+<span class="fc" id="L52">		result.addCard(new PlayerCreditCard(&quot;You have won a Crossword competition&quot;, 100));</span>
+<span class="fc" id="L53">		return result;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

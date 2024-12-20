@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WildCardHand.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">games</a> &gt; <a href="index.source.html" class="el_package">org.douggschwind.games.cardgames.wildcardpoker</a> &gt; <span class="el_source">WildCardHand.java</span></div><h1>WildCardHand.java</h1><pre class="source lang-java linenums">package org.douggschwind.games.cardgames.wildcardpoker;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.douggschwind.games.cardgames.common.FrenchSuitedPlayingCard;
+import org.douggschwind.games.cardgames.poker.common.FiveOfAKind;
+import org.douggschwind.games.cardgames.poker.common.FourOfAKind;
+import org.douggschwind.games.cardgames.poker.common.HandStrength;
+
+/**
+ * An instance of this class represents a poker hand that has at least one
+ * Wild Card within it, and a total of five cards in the player's hand.
+ * @author Doug Gschwind
+ */
+public abstract class WildCardHand {
+	
+	private final Map&lt;FrenchSuitedPlayingCard.Kind, Integer&gt; numNonWildKindOccurrencesMap;
+	private final int numDistinctNonWildSuits;
+<span class="fc" id="L21">	private final List&lt;FrenchSuitedPlayingCard&gt; sortedNonWildCardsInHand = new ArrayList&lt;&gt;();</span>
+	private final FrenchSuitedPlayingCard nonWildHighCard;
+	private final FrenchSuitedPlayingCard nonWildLowCard;
+	
+	/**
+	 * @param numDistinctNonWildSuits
+	 * @param sortedNonWildCardsInHand Must be non-null and non-empty, and sorted by Kind
+	 * in descending order.
+	 */
+	protected WildCardHand(Map&lt;FrenchSuitedPlayingCard.Kind, Integer&gt; numNonWildKindOccurrencesMap,
+			               int numDistinctNonWildSuits,
+			               List&lt;FrenchSuitedPlayingCard&gt; sortedNonWildCardsInHand) {
+<span class="fc" id="L33">		super();</span>
+<span class="fc" id="L34">		this.numNonWildKindOccurrencesMap = numNonWildKindOccurrencesMap;</span>
+<span class="fc" id="L35">		this.numDistinctNonWildSuits = numDistinctNonWildSuits;</span>
+<span class="fc" id="L36">		this.sortedNonWildCardsInHand.addAll(sortedNonWildCardsInHand);</span>
+<span class="fc" id="L37">		this.nonWildHighCard = sortedNonWildCardsInHand.get(0);</span>
+<span class="fc" id="L38">		this.nonWildLowCard = sortedNonWildCardsInHand.get(sortedNonWildCardsInHand.size() - 1);</span>
+<span class="fc" id="L39">	}</span>
+	
+	protected Map&lt;FrenchSuitedPlayingCard.Kind, Integer&gt; getNumNonWildKindOccurrencesMap() {
+<span class="fc" id="L42">		return numNonWildKindOccurrencesMap;</span>
+	}
+	
+	/**
+	 * @return The number of distinct Kinds found in the players
+	 * hand that are not wild cards. If the player had a full house
+	 * of Aces and Eights and Twos were wild, the number of distinct
+	 * kinds in that hand is two.
+	 */
+	protected int getNumDistinctNonWildKinds() {
+<span class="fc" id="L52">		return getNumNonWildKindOccurrencesMap().size();</span>
+	}
+	
+	protected int getNumDistinctNonWildSuits() {
+<span class="fc" id="L56">		return numDistinctNonWildSuits;</span>
+	}
+	
+	protected final boolean isSingleSuited() {
+<span class="fc bfc" id="L60" title="All 2 branches covered.">		return (getNumDistinctNonWildSuits() == 1);</span>
+	}
+	
+	protected List&lt;FrenchSuitedPlayingCard&gt; getSortedNonWildCardsInHand() {
+<span class="fc" id="L64">		return sortedNonWildCardsInHand;</span>
+	}
+	
+	protected final FrenchSuitedPlayingCard getNonWildHighCard() {
+<span class="fc" id="L68">		return nonWildHighCard;</span>
+	}
+	
+	protected final FrenchSuitedPlayingCard getNonWildLowCard() {
+<span class="fc" id="L72">		return nonWildLowCard;</span>
+	}
+	
+	protected FiveOfAKind createFiveOfAKind(FrenchSuitedPlayingCard.Kind kind) {
+<span class="fc" id="L76">		return new FiveOfAKind(kind);</span>
+	}
+	
+	protected FourOfAKind createFourOfAKind(FrenchSuitedPlayingCard.Kind kind) {
+<span class="fc" id="L80">		return new FourOfAKind(kind);</span>
+	}
+	
+	protected int computeDistanceBetweenHighAndLowCards() {
+<span class="fc" id="L84">		return FrenchSuitedPlayingCard.Kind.computeDistance(getNonWildLowCard().getKind(), getNonWildHighCard().getKind());</span>
+	}
+	
+	/**
+	 * This method assumes the player is single suited and has a wild card for each
+	 * non-wild card missing from their hand for the given Suit.
+	 * @return Will be non-null.
+	 */
+	protected final TypeOfStraightThatCanBeFormed determineTypeOfStraightThatCanBeFormed() {
+<span class="fc" id="L93">		FrenchSuitedPlayingCard highCard = getNonWildHighCard();</span>
+<span class="fc" id="L94">		FrenchSuitedPlayingCard lowCard = getNonWildLowCard();</span>
+		
+<span class="fc" id="L96">		int highAndLowCardDistance = computeDistanceBetweenHighAndLowCards();</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">		if (highAndLowCardDistance &lt;= 4) {</span>
+			// The wild cards can be used to make at least a Straight Flush
+<span class="fc" id="L99">			Boolean lowCardIsTenOrHigher = lowCard.getKind().hasHigherRank(FrenchSuitedPlayingCard.Kind.Nine);</span>
+<span class="fc bfc" id="L100" title="All 4 branches covered.">			if ((lowCardIsTenOrHigher != null) &amp;&amp; (lowCardIsTenOrHigher.booleanValue())) {</span>
+<span class="fc" id="L101">				return new TypeOfStraightThatCanBeFormed(TypeOfStraightThatCanBeFormed.StraightType.ACE_HIGH_STRAIGHT, FrenchSuitedPlayingCard.Kind.Ace);</span>
+			} else {
+<span class="fc" id="L103">				FrenchSuitedPlayingCard.Kind straightFlushHighKind = highCard.getKind();</span>
+<span class="fc bfc" id="L104" title="All 4 branches covered.">				switch (highAndLowCardDistance) {</span>
+					case 1:
+<span class="fc" id="L106">						straightFlushHighKind = straightFlushHighKind.getNextHigherRankingKind();</span>
+					case 2:
+<span class="fc" id="L108">						straightFlushHighKind = straightFlushHighKind.getNextHigherRankingKind();</span>
+					case 3:
+<span class="fc" id="L110">						straightFlushHighKind = straightFlushHighKind.getNextHigherRankingKind();</span>
+					default:
+				}
+<span class="fc" id="L113">				return new TypeOfStraightThatCanBeFormed(TypeOfStraightThatCanBeFormed.StraightType.STRAIGHT, straightFlushHighKind);</span>
+			}
+		} else {
+<span class="fc bfc" id="L116" title="All 2 branches covered.">			if (highCard.isAce()) {</span>
+<span class="fc" id="L117">				FrenchSuitedPlayingCard secondHighestCard = getSortedNonWildCardsInHand().get(1);</span>
+<span class="fc" id="L118">				Boolean secondHighestCardIsFiveOrLower = secondHighestCard.getKind().hasLowerRank(FrenchSuitedPlayingCard.Kind.Six);</span>
+<span class="fc bfc" id="L119" title="All 4 branches covered.">				if ((secondHighestCardIsFiveOrLower != null) &amp;&amp; (secondHighestCardIsFiveOrLower.booleanValue())) {</span>
+					// Ace low straight
+<span class="fc" id="L121">					return new TypeOfStraightThatCanBeFormed(TypeOfStraightThatCanBeFormed.StraightType.ACE_LOW_STRAIGHT, FrenchSuitedPlayingCard.Kind.Five);</span>
+				}
+			}
+		}
+		
+<span class="fc" id="L126">		return new TypeOfStraightThatCanBeFormed(TypeOfStraightThatCanBeFormed.StraightType.NONE, null);</span>
+	}
+
+	/**
+	 * Concrete subclasses must provide an implementation of this method.
+	 * @return Will be non-null.
+	 */
+	protected abstract HandStrength determineBestPossibleHand();
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

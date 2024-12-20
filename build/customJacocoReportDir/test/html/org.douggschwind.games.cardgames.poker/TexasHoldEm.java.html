@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TexasHoldEm.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">games</a> &gt; <a href="index.source.html" class="el_package">org.douggschwind.games.cardgames.poker</a> &gt; <span class="el_source">TexasHoldEm.java</span></div><h1>TexasHoldEm.java</h1><pre class="source lang-java linenums">package org.douggschwind.games.cardgames.poker;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.douggschwind.games.cardgames.common.FrenchSuitedPlayingCard;
+import org.douggschwind.games.cardgames.common.DeckFactory;
+import org.douggschwind.games.cardgames.common.Player;
+import org.douggschwind.games.cardgames.common.StandardDeckCardGame;
+import org.douggschwind.games.cardgames.poker.common.Flush;
+import org.douggschwind.games.cardgames.poker.common.HandStrength;
+import org.douggschwind.games.cardgames.poker.common.HighCard;
+import org.douggschwind.games.cardgames.poker.common.Pair;
+import org.douggschwind.games.cardgames.poker.common.RoyalFlush;
+import org.douggschwind.games.cardgames.poker.common.Straight;
+import org.douggschwind.games.cardgames.poker.common.StraightFlush;
+import org.douggschwind.games.cardgames.poker.common.TwoPair;
+
+/**
+ * Best five out of seven cards poker, no wild cards, and five &quot;river&quot; cards
+ * that are shared by all players. This implementation does not concern itself
+ * with either the small or big blind, but rather which player would win given
+ * any card combination in their hand and in the river cards.
+ * @author Doug Gschwind
+ */
+public class TexasHoldEm extends StandardDeckCardGame {
+	
+<span class="nc" id="L32">	private Set&lt;FrenchSuitedPlayingCard&gt; riverCards = new HashSet&lt;&gt;();</span>
+
+	public TexasHoldEm() {
+<span class="nc" id="L35">		super(DeckFactory.createStandardDeck());</span>
+<span class="nc" id="L36">	}</span>
+	
+	@Override
+	protected final int getNumberCardsDealtToEachPlayer() {
+<span class="nc" id="L40">		return 2;</span>
+	}
+
+	@Override
+	public void dealCardsToPlayers() {
+<span class="nc" id="L45">		super.dealCardsToPlayers();</span>
+		
+<span class="nc" id="L47">		riverCards.add(getDeck().dealCard());</span>
+<span class="nc" id="L48">		riverCards.add(getDeck().dealCard());</span>
+<span class="nc" id="L49">		riverCards.add(getDeck().dealCard());</span>
+<span class="nc" id="L50">		getDeck().dealCard(); // Burn card after flop</span>
+<span class="nc" id="L51">		riverCards.add(getDeck().dealCard());</span>
+<span class="nc" id="L52">		getDeck().dealCard(); // Burn card</span>
+<span class="nc" id="L53">		riverCards.add(getDeck().dealCard());</span>
+<span class="nc" id="L54">	}</span>
+	
+	private HandStrength determinePlayerHandStrengthNoMatchingKinds(Player player) {
+<span class="nc" id="L57">		Map&lt;FrenchSuitedPlayingCard.Suit, Integer&gt; numSuitOccurrences = determineNumSuitOccurrencesInHand(player);</span>
+		// Make a copy of the player's hand so that we leave the players hand in
+		// its originally dealt form.
+<span class="nc" id="L60">		List&lt;FrenchSuitedPlayingCard&gt; playerHand = new ArrayList&lt;&gt;(player.getHand());</span>
+<span class="nc" id="L61">		Collections.sort(playerHand);</span>
+<span class="nc" id="L62">		FrenchSuitedPlayingCard lowCard = playerHand.get(4);</span>
+<span class="nc" id="L63">		FrenchSuitedPlayingCard highCard = playerHand.get(0);</span>
+<span class="nc" id="L64">		FrenchSuitedPlayingCard secondHighestCard = playerHand.get(1);</span>
+<span class="nc" id="L65">		int lowToHighDistance = FrenchSuitedPlayingCard.Kind.computeDistance(lowCard.getKind(), highCard.getKind());</span>
+<span class="nc bnc" id="L66" title="All 2 branches missed.">		if (numSuitOccurrences.size() == 1) {</span>
+			// Player has a flush, straight flush, or royal flush
+<span class="nc bnc" id="L68" title="All 2 branches missed.">			if (lowToHighDistance == 4) {</span>
+				// Player has a straight flush or a royal flush
+<span class="nc bnc" id="L70" title="All 2 branches missed.">				return highCard.isAce() ? new RoyalFlush() : new StraightFlush(highCard.getKind());</span>
+<span class="nc bnc" id="L71" title="All 2 branches missed.">			} else if (highCard.isAce()) {</span>
+<span class="nc" id="L72">				lowToHighDistance = FrenchSuitedPlayingCard.Kind.computeDistance(lowCard.getKind(), secondHighestCard.getKind());</span>
+<span class="nc bnc" id="L73" title="All 2 branches missed.">				if ((lowToHighDistance == 3) &amp;&amp;</span>
+<span class="nc bnc" id="L74" title="All 2 branches missed.">					(lowCard.getKind() == FrenchSuitedPlayingCard.Kind.Two)) {</span>
+					// Ace low straight flush
+<span class="nc" id="L76">					return new StraightFlush(secondHighestCard.getKind());</span>
+				}
+			}
+			
+			// Player has a flush
+<span class="nc" id="L81">			return new Flush(highCard.getKind());</span>
+		} else {
+			// Player has a high card hand or a straight
+<span class="nc bnc" id="L84" title="All 2 branches missed.">			if (lowToHighDistance == 4) {</span>
+<span class="nc" id="L85">				return new Straight(highCard.getKind());</span>
+<span class="nc bnc" id="L86" title="All 2 branches missed.">			} else if (highCard.isAce()) {</span>
+<span class="nc" id="L87">				lowToHighDistance = FrenchSuitedPlayingCard.Kind.computeDistance(lowCard.getKind(), secondHighestCard.getKind());</span>
+<span class="nc bnc" id="L88" title="All 2 branches missed.">				if ((lowToHighDistance == 3) &amp;&amp;</span>
+<span class="nc bnc" id="L89" title="All 2 branches missed.">					(lowCard.getKind() == FrenchSuitedPlayingCard.Kind.Two)) {</span>
+					// Ace low straight
+<span class="nc" id="L91">					return new Straight(secondHighestCard.getKind());</span>
+				}
+			}
+<span class="nc" id="L94">			return new HighCard(highCard.getKind());</span>
+		}
+	}
+	
+	@Override
+	public HandStrength determinePlayerHandStrength(Player player) {
+<span class="nc" id="L100">		List&lt;FrenchSuitedPlayingCard&gt; playersHand = new ArrayList&lt;&gt;(riverCards);</span>
+<span class="nc" id="L101">		playersHand.addAll(player.getHand());</span>
+<span class="nc" id="L102">		Map&lt;FrenchSuitedPlayingCard.Kind, Integer&gt; numKindOccurrences = determineNumKindOccurrencesInHand(playersHand);</span>
+		
+<span class="nc bnc" id="L104" title="All 2 branches missed.">		if (numKindOccurrences.size() == 7) {</span>
+			// Player has no matching kinds, but instead could have a
+			// Straight, Flush, Straight Flush, Royal Flush, or simply
+			// a HighCard hand.
+<span class="nc" id="L108">			return determinePlayerHandStrengthNoMatchingKinds(player);</span>
+<span class="nc bnc" id="L109" title="All 2 branches missed.">		} else if (numKindOccurrences.size() == 6) {</span>
+			// With six distinct kind cards out of seven, the player
+			// simply has a Pair, but the remaining five cards still
+			// need to be evaluated as they may contain a Straight,
+			// Flush, Straight Flush, or Royal Flush which is a
+			// stronger hand than simply a Pair.
+<span class="nc" id="L115">			return determinePlayerHandPair(numKindOccurrences);</span>
+<span class="nc bnc" id="L116" title="All 2 branches missed.">		} else if (numKindOccurrences.size() == 5) {</span>
+			// The player could have three of a kind or two pair.
+<span class="nc bnc" id="L118" title="All 2 branches missed.">		} else if (numKindOccurrences.size() == 4) {</span>
+			// The player could have four of a kind, a full house,
+			// three of a kind, or three pair. In case the player
+			// does have three pair, the best two pair of those
+			// three can be used. In the case of three of a kind
+			// though, the other four cards in the player's hand
+			// need to be considered as they, with one of the other
+			// cards, could form a Straight, Flush, Straight Flush,
+			// or Royal Flush, all of which are stronger than a
+			// Three of a Kind hand.
+		}
+		
+		// TODO Auto-generated method stub
+<span class="nc" id="L131">		return null;</span>
+	}
+	
+	@Override
+	protected final boolean canPlayersHandHoldTiebreakerCards(HandStrength playerHandStrength) {
+<span class="nc bnc" id="L136" title="All 8 branches missed.">		return ((playerHandStrength instanceof HighCard) ||</span>
+				(playerHandStrength instanceof Pair) ||
+				(playerHandStrength instanceof TwoPair) ||
+				(playerHandStrength instanceof Flush));
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WildCardHandFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">games</a> &gt; <a href="index.source.html" class="el_package">org.douggschwind.games.cardgames.wildcardpoker</a> &gt; <span class="el_source">WildCardHandFactory.java</span></div><h1>WildCardHandFactory.java</h1><pre class="source lang-java linenums">package org.douggschwind.games.cardgames.wildcardpoker;
+
+import java.util.List;
+import java.util.Map;
+
+import org.douggschwind.games.cardgames.common.FrenchSuitedPlayingCard;
+
+/**
+ * Creates an appropriate WildCardHand instance to most easily
+ * determine the best possible player hand.
+ * @author Doug Gschwind
+ */
+<span class="nc" id="L13">public class WildCardHandFactory {</span>
+
+	/**
+	 * @param numberWildCardsInHand One of : 1, 2, 3, or 4.
+	 * @param numNonWildKindOccurrencesMap A Map that houses the distinct
+	 * non wild Kinds found in the player's hand and the number of occurrences
+	 * per Kind in the hand.
+	 * @param numDistinctNonWildSuits The number of distinct Suits
+	 * represented in the hand that are not wild cards.
+	 * @param sortedNonWildCardsInHand Must be non-null and non-empty, expected
+	 * to be sorted in descending order by Kind.
+	 * @return Will be non-null.
+	 * @throws IllegalArgumentException
+	 */
+	public static WildCardHand create(int numberWildCardsInHand,
+			                          Map&lt;FrenchSuitedPlayingCard.Kind, Integer&gt; numNonWildKindOccurrencesMap,
+			                          int numDistinctNonWildSuits,
+			                          List&lt;FrenchSuitedPlayingCard&gt; sortedNonWildCardsInHand) {
+<span class="pc bpc" id="L31" title="1 of 5 branches missed.">		switch (numberWildCardsInHand) {</span>
+			case 1:
+<span class="fc" id="L33">				return new OneWildCardHand(numNonWildKindOccurrencesMap, numDistinctNonWildSuits, sortedNonWildCardsInHand);</span>
+			case 2:
+<span class="fc" id="L35">				return new TwoWildCardsHand(numNonWildKindOccurrencesMap, numDistinctNonWildSuits, sortedNonWildCardsInHand);</span>
+			case 3:
+<span class="fc" id="L37">				return new ThreeWildCardsHand(numNonWildKindOccurrencesMap, numDistinctNonWildSuits, sortedNonWildCardsInHand);</span>
+			case 4:
+<span class="fc" id="L39">				return new FourWildCardsHand(numNonWildKindOccurrencesMap, sortedNonWildCardsInHand);</span>
+			default:
+<span class="nc" id="L41">				throw new IllegalArgumentException();</span>
+		}
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

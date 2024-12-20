@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CommonMove.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">games</a> &gt; <a href="index.source.html" class="el_package">org.douggschwind.games.chess.moves</a> &gt; <span class="el_source">CommonMove.java</span></div><h1>CommonMove.java</h1><pre class="source lang-java linenums">package org.douggschwind.games.chess.moves;
+
+import org.douggschwind.games.chess.ChessBoard;
+import org.douggschwind.games.chess.Player;
+import org.douggschwind.games.chess.Square;
+import org.douggschwind.games.chess.piece.ChessPiece;
+
+/**
+ * Represents the most common of moves in Chess, one piece being moved from one Square to another.
+ * @author Doug Gschwind
+ */
+public class CommonMove &lt;T extends ChessPiece&gt; implements ChessMove {
+    private final Square from;
+    private final Square to;
+
+<span class="fc" id="L16">    public &lt;T&gt; CommonMove(Class&lt;T&gt; chessPieceClass, Square from, Square to) {</span>
+<span class="pc bpc" id="L17" title="2 of 4 branches missed.">        if ((from == null) || (to == null)) {</span>
+<span class="nc" id="L18">            throw new IllegalArgumentException(&quot;From and To Square must both be non-null&quot;);</span>
+<span class="pc bpc" id="L19" title="1 of 2 branches missed.">        } else if (from.equals(to)) {</span>
+<span class="nc" id="L20">            throw new IllegalArgumentException(&quot;From and To Square cannot be the same&quot;);</span>
+<span class="pc bpc" id="L21" title="1 of 2 branches missed.">        } else if (!from.isOccupied()) {</span>
+<span class="nc" id="L22">            throw new IllegalArgumentException(&quot;There is no piece occupying From&quot;);</span>
+<span class="pc bpc" id="L23" title="1 of 2 branches missed.">        } else if (!chessPieceClass.equals(from.getResident().get().getClass())) {</span>
+<span class="nc" id="L24">            throw new IllegalArgumentException(&quot;The piece occupying From is not of type &quot; + chessPieceClass.getSimpleName());</span>
+        }
+
+<span class="fc" id="L27">        this.from = from;</span>
+<span class="fc" id="L28">        this.to = to;</span>
+<span class="fc" id="L29">    }</span>
+
+    @Override
+    public final boolean isCommonMove() {
+<span class="nc" id="L33">        return true;</span>
+    }
+
+    public Square getFrom() {
+<span class="fc" id="L37">        return from;</span>
+    }
+
+    public Square getTo() {
+<span class="fc" id="L41">        return to;</span>
+    }
+
+    /**
+     * Determines if this move is permitted by the given Player and state of the ChessBoard.
+     * @param player Must be non-null.
+     * @param chessBoard Must be non-null.
+     * @return true if this proposed move is permitted by the given Player, false otherwise.
+     */
+    @Override
+    public boolean isPermitted(Player player, ChessBoard chessBoard) {
+<span class="nc bnc" id="L52" title="All 2 branches missed.">        if (!player.canMoveFrom(getFrom())) {</span>
+<span class="nc" id="L53">            return false;</span>
+        }
+
+<span class="nc" id="L56">        return getFrom().getResident().get().canMoveTo(chessBoard, this);</span>
+    }
+
+    public int getAbsNumRowsMovement() {
+<span class="fc" id="L60">        return Math.abs(from.getRow().getId() - to.getRow().getId());</span>
+    }
+
+    public int getAbsNumColumnsMovement() {
+<span class="fc" id="L64">        return Math.abs(from.getColumn().getId() - to.getColumn().getId());</span>
+    }
+
+    public boolean isHorizontalMove() {
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">        return getAbsNumRowsMovement() == 0;</span>
+    }
+
+    public boolean isVerticalMove() {
+<span class="fc bfc" id="L72" title="All 2 branches covered.">        return getAbsNumColumnsMovement() == 0;</span>
+    }
+
+    public boolean isDiagonalMove() {
+        // Number of rows of movement must equal number of columns to move diagonally.
+<span class="fc bfc" id="L77" title="All 2 branches covered.">        return getAbsNumRowsMovement() == getAbsNumColumnsMovement();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

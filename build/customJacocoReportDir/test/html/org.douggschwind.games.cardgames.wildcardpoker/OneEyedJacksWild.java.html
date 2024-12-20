@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OneEyedJacksWild.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">games</a> &gt; <a href="index.source.html" class="el_package">org.douggschwind.games.cardgames.wildcardpoker</a> &gt; <span class="el_source">OneEyedJacksWild.java</span></div><h1>OneEyedJacksWild.java</h1><pre class="source lang-java linenums">package org.douggschwind.games.cardgames.wildcardpoker;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.douggschwind.games.cardgames.common.FrenchSuitedPlayingCard;
+import org.douggschwind.games.cardgames.common.DeckFactory;
+import org.douggschwind.games.cardgames.common.Player;
+import org.douggschwind.games.cardgames.poker.common.Flush;
+import org.douggschwind.games.cardgames.poker.common.HandStrength;
+import org.douggschwind.games.cardgames.poker.common.HighCard;
+import org.douggschwind.games.cardgames.poker.common.Pair;
+import org.douggschwind.games.cardgames.poker.common.TwoPair;
+
+/**
+ * This is a 5 card draw poker game where the Jack of Spades and the
+ * Jack of Hearts, the &quot;one eyed&quot; Jacks are wild. The Jack of Clubs
+ * and the Jack of Diamonds are not considered wild cards.
+ * For the purposes of this game, the drawing part of the game is ignored
+ * in favor of simply dealing with the 5 cards dealt to each player.
+ * @author Doug Gschwind
+ */
+public class OneEyedJacksWild extends WildCardGame {
+	
+<span class="fc" id="L27">	private static final FrenchSuitedPlayingCard JACK_OF_SPADES = new FrenchSuitedPlayingCard(FrenchSuitedPlayingCard.Kind.Jack, FrenchSuitedPlayingCard.Suit.Spades);</span>
+<span class="fc" id="L28">	private static final FrenchSuitedPlayingCard JACK_OF_HEARTS = new FrenchSuitedPlayingCard(FrenchSuitedPlayingCard.Kind.Jack, FrenchSuitedPlayingCard.Suit.Hearts);</span>
+
+	public OneEyedJacksWild() {
+<span class="fc" id="L31">		super(DeckFactory.createStandardDeck());</span>
+		// Since Card instances are essentially ValueObjects, just create
+		// new Card instances to specify wild cards, rather than trying
+		// to obtain the correct Card references out of the deck.
+<span class="fc" id="L35">		addWildCard(JACK_OF_SPADES);</span>
+<span class="fc" id="L36">		addWildCard(JACK_OF_HEARTS);</span>
+<span class="fc" id="L37">	}</span>
+
+	@Override
+	protected final int getNumberCardsDealtToEachPlayer() {
+<span class="fc" id="L41">		return 5;</span>
+	}
+	
+	@Override
+	public HandStrength determinePlayerHandStrength(Player player) {
+<span class="fc" id="L46">		final int numberOfWildCardsInHand = determineNumberOfWildCardsInPlayersHand(player.getHand());</span>
+<span class="fc bfc" id="L47" title="All 2 branches covered.">		if (numberOfWildCardsInHand == 0) {</span>
+			// player has no wild cards.
+<span class="fc" id="L49">			return super.determinePlayerHandStrength(player);</span>
+		}
+		
+<span class="fc" id="L52">		final Map&lt;FrenchSuitedPlayingCard.Kind, Integer&gt; numKindOccurrencesMap = determineNumKindOccurrencesInHand(player.getHand());</span>
+
+		// Now lets determine if we have non-wild Jacks in the Player's hand.
+<span class="fc" id="L55">		Map&lt;FrenchSuitedPlayingCard.Kind, Integer&gt; numNonWildKindOccurrencesMap = new HashMap&lt;&gt;(numKindOccurrencesMap);</span>
+<span class="fc" id="L56">		int numberOfNonWildJacksInHand = 0;</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">		for (FrenchSuitedPlayingCard card : player.getHand()) {</span>
+<span class="fc bfc" id="L58" title="All 4 branches covered.">			if (card.isJack() &amp;&amp; !isWildCard(card)) {</span>
+<span class="fc" id="L59">				numberOfNonWildJacksInHand++;</span>
+			}
+<span class="fc" id="L61">		}</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">		if (numberOfNonWildJacksInHand &gt; 0) {</span>
+<span class="fc" id="L63">			numNonWildKindOccurrencesMap.put(FrenchSuitedPlayingCard.Kind.Jack, numberOfNonWildJacksInHand);</span>
+		} else {
+<span class="fc" id="L65">			numNonWildKindOccurrencesMap.remove(FrenchSuitedPlayingCard.Kind.Jack);</span>
+		}
+		
+<span class="fc" id="L68">		List&lt;FrenchSuitedPlayingCard&gt; sortedNonWildCards = eliminateWildCards(player.getHand());</span>
+		// Sort the natural non wild cards into descending order.
+<span class="fc" id="L70">		Collections.sort(sortedNonWildCards);</span>
+<span class="fc" id="L71">		Map&lt;FrenchSuitedPlayingCard.Suit,Integer&gt; nonWildCardNumSuitOccurrencesMap = determineNumSuitOccurrencesInHand(sortedNonWildCards);</span>
+		
+<span class="fc" id="L73">		WildCardHand wildCardHand = WildCardHandFactory.create(numberOfWildCardsInHand,</span>
+				                                               numNonWildKindOccurrencesMap,
+<span class="fc" id="L75">				                                               nonWildCardNumSuitOccurrencesMap.size(),</span>
+				                                               sortedNonWildCards);
+<span class="fc" id="L77">		return wildCardHand.determineBestPossibleHand();</span>
+	}
+	
+	@Override
+	protected final boolean canPlayersHandHoldTiebreakerCards(HandStrength playerHandStrength) {
+<span class="nc bnc" id="L82" title="All 8 branches missed.">		return ((playerHandStrength instanceof HighCard) ||</span>
+				(playerHandStrength instanceof Pair) ||
+				(playerHandStrength instanceof TwoPair) ||
+				(playerHandStrength instanceof Flush));
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

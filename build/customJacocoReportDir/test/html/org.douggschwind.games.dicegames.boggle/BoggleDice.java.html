@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BoggleDice.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">games</a> &gt; <a href="index.source.html" class="el_package">org.douggschwind.games.dicegames.boggle</a> &gt; <span class="el_source">BoggleDice.java</span></div><h1>BoggleDice.java</h1><pre class="source lang-java linenums">package org.douggschwind.games.dicegames.boggle;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+/**
+ * Represents the abstraction that abstracts away whether we are using a 4x4 game board or a 5x5 game board.
+ * @author Doug Gschwind
+ */
+<span class="nc" id="L11">public abstract class BoggleDice {</span>
+    public static BoggleDice for4x4Board() {
+<span class="nc" id="L13">        return new Boggle4x4Dice();</span>
+    }
+
+    public static BoggleDice for5x5Board() {
+<span class="nc" id="L17">        return new Boggle5x5Dice();</span>
+    }
+
+    /**
+     * @return The size of the supported game board, where size indicates the number of rows and the same number
+     * of columns on the game board.
+     */
+    public abstract int size();
+
+    /**
+     * @return An array where within each element is a List of DieLetters representing all six possible letters that
+     * can appear on the die. This array in total represent all of the dice supported for a given game board
+     * configuration.
+     */
+    public abstract List&lt;DieLetter&gt;[] getSupportedDice();
+
+    /**
+     * Shakes all of the dice and shuffles them such that they have all fallen into place on the game board.
+     * @return The board configuration. Will be non-null.
+     */
+    public final DieLetter[][] shake() {
+<span class="nc" id="L38">        final int gameBoardSize = size();</span>
+
+<span class="nc" id="L40">        Random random = new Random();</span>
+<span class="nc" id="L41">        List&lt;Integer&gt; dieIndicators = new ArrayList&lt;&gt;(gameBoardSize * gameBoardSize);</span>
+<span class="nc bnc" id="L42" title="All 2 branches missed.">        for (int i = 0;i &lt; gameBoardSize * gameBoardSize;i++) {</span>
+<span class="nc" id="L43">            dieIndicators.add(i);</span>
+        }
+
+<span class="nc" id="L46">        DieLetter[][] result = new DieLetter[gameBoardSize][];</span>
+
+<span class="nc bnc" id="L48" title="All 2 branches missed.">        for (int row = 0;row &lt; gameBoardSize;row++) {</span>
+<span class="nc" id="L49">            result[row] = new DieLetter[gameBoardSize];</span>
+
+<span class="nc bnc" id="L51" title="All 2 branches missed.">            for (int col = 0;col &lt; gameBoardSize;col++) {</span>
+                // Determine the die that has fallen into this position on the game board.
+
+                int dieIndicator;
+<span class="nc bnc" id="L55" title="All 2 branches missed.">                if (dieIndicators.size() &gt; 1) {</span>
+<span class="nc" id="L56">                    dieIndicator = dieIndicators.get(random.nextInt(dieIndicators.size()));</span>
+                    // Remove the die now being used from those available so that it cannot be
+                    // selected the next time through this loop. I am being careful to ensure
+                    // List.remove(Object o) is being called here rather than List.remove(int index).
+<span class="nc" id="L60">                    dieIndicators.remove(Integer.valueOf(dieIndicator));</span>
+                } else {
+<span class="nc" id="L62">                    dieIndicator = dieIndicators.iterator().next().intValue();</span>
+                }
+<span class="nc" id="L64">                List&lt;DieLetter&gt; dieFound = getSupportedDice()[dieIndicator];</span>
+<span class="nc" id="L65">                DieLetter letterShown = dieFound.get(random.nextInt(6));</span>
+<span class="nc" id="L66">                result[row][col] = letterShown;</span>
+            }
+        }
+
+<span class="nc" id="L70">        return result;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

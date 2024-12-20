@@ -1,0 +1,458 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Boggle.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">games</a> &gt; <a href="index.source.html" class="el_package">org.douggschwind.games.dicegames.boggle</a> &gt; <span class="el_source">Boggle.java</span></div><h1>Boggle.java</h1><pre class="source lang-java linenums">package org.douggschwind.games.dicegames.boggle;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.function.BiConsumer;
+
+/**
+ * This class is the entry point into which you can see the game being setup and the possible words on
+ * the game board to be found. Supports either 4x4 or 5x5 game board configurations.
+ * @author Doug Gschwind
+ */
+<span class="fc" id="L16">public class Boggle {</span>
+    private static final String GAME_BOARD_HEADER_4X4 = &quot;\t-----------&quot;;
+    private static final String GAME_BOARD_HEADER_5x5 = &quot;\t--------------&quot;;
+
+<span class="fc" id="L20">    private static final Set&lt;String&gt; validWords = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L21">    private static final WordTree wordTree = new WordTree();</span>
+
+    static {
+        // Obviously a heavily abbreviated set of valid words from those of the English language, just to keep
+        // this reasonable and allow for testing to be considered conclusive.
+<span class="fc" id="L26">        validWords.add(&quot;act&quot;);</span>
+<span class="fc" id="L27">        validWords.add(&quot;acted&quot;);</span>
+<span class="fc" id="L28">        validWords.add(&quot;actor&quot;);</span>
+<span class="fc" id="L29">        validWords.add(&quot;acts&quot;);</span>
+<span class="fc" id="L30">        validWords.add(&quot;and&quot;);</span>
+<span class="fc" id="L31">        validWords.add(&quot;any&quot;);</span>
+<span class="fc" id="L32">        validWords.add(&quot;anything&quot;);</span>
+<span class="fc" id="L33">        validWords.add(&quot;apple&quot;);</span>
+<span class="fc" id="L34">        validWords.add(&quot;ask&quot;);</span>
+<span class="fc" id="L35">        validWords.add(&quot;ate&quot;);</span>
+<span class="fc" id="L36">        validWords.add(&quot;axe&quot;);</span>
+<span class="fc" id="L37">        validWords.add(&quot;axed&quot;);</span>
+<span class="fc" id="L38">        validWords.add(&quot;axes&quot;);</span>
+<span class="fc" id="L39">        validWords.add(&quot;bail&quot;);</span>
+<span class="fc" id="L40">        validWords.add(&quot;bait&quot;);</span>
+<span class="fc" id="L41">        validWords.add(&quot;ban&quot;);</span>
+<span class="fc" id="L42">        validWords.add(&quot;banana&quot;);</span>
+<span class="fc" id="L43">        validWords.add(&quot;bane&quot;);</span>
+<span class="fc" id="L44">        validWords.add(&quot;bans&quot;);</span>
+<span class="fc" id="L45">        validWords.add(&quot;banned&quot;);</span>
+<span class="fc" id="L46">        validWords.add(&quot;bar&quot;);</span>
+<span class="fc" id="L47">        validWords.add(&quot;bare&quot;);</span>
+<span class="fc" id="L48">        validWords.add(&quot;bars&quot;);</span>
+<span class="fc" id="L49">        validWords.add(&quot;bares&quot;);</span>
+<span class="fc" id="L50">        validWords.add(&quot;base&quot;);</span>
+<span class="fc" id="L51">        validWords.add(&quot;bases&quot;);</span>
+<span class="fc" id="L52">        validWords.add(&quot;bat&quot;);</span>
+<span class="fc" id="L53">        validWords.add(&quot;bats&quot;);</span>
+<span class="fc" id="L54">        validWords.add(&quot;bay&quot;);</span>
+<span class="fc" id="L55">        validWords.add(&quot;bays&quot;);</span>
+<span class="fc" id="L56">        validWords.add(&quot;bear&quot;);</span>
+<span class="fc" id="L57">        validWords.add(&quot;bears&quot;);</span>
+<span class="fc" id="L58">        validWords.add(&quot;bee&quot;);</span>
+<span class="fc" id="L59">        validWords.add(&quot;been&quot;);</span>
+<span class="fc" id="L60">        validWords.add(&quot;bet&quot;);</span>
+<span class="fc" id="L61">        validWords.add(&quot;bets&quot;);</span>
+<span class="fc" id="L62">        validWords.add(&quot;boat&quot;);</span>
+<span class="fc" id="L63">        validWords.add(&quot;boats&quot;);</span>
+<span class="fc" id="L64">        validWords.add(&quot;bold&quot;);</span>
+<span class="fc" id="L65">        validWords.add(&quot;boo&quot;);</span>
+<span class="fc" id="L66">        validWords.add(&quot;booed&quot;);</span>
+<span class="fc" id="L67">        validWords.add(&quot;boos&quot;);</span>
+<span class="fc" id="L68">        validWords.add(&quot;boot&quot;);</span>
+<span class="fc" id="L69">        validWords.add(&quot;boots&quot;);</span>
+<span class="fc" id="L70">        validWords.add(&quot;borrow&quot;);</span>
+<span class="fc" id="L71">        validWords.add(&quot;bought&quot;);</span>
+<span class="fc" id="L72">        validWords.add(&quot;cat&quot;);</span>
+<span class="fc" id="L73">        validWords.add(&quot;coo&quot;);</span>
+<span class="fc" id="L74">        validWords.add(&quot;cot&quot;);</span>
+<span class="fc" id="L75">        validWords.add(&quot;cub&quot;);</span>
+<span class="fc" id="L76">        validWords.add(&quot;cubs&quot;);</span>
+<span class="fc" id="L77">        validWords.add(&quot;cut&quot;);</span>
+<span class="fc" id="L78">        validWords.add(&quot;cuts&quot;);</span>
+<span class="fc" id="L79">        validWords.add(&quot;dane&quot;);</span>
+<span class="fc" id="L80">        validWords.add(&quot;danes&quot;);</span>
+<span class="fc" id="L81">        validWords.add(&quot;dig&quot;);</span>
+<span class="fc" id="L82">        validWords.add(&quot;digs&quot;);</span>
+<span class="fc" id="L83">        validWords.add(&quot;dog&quot;);</span>
+<span class="fc" id="L84">        validWords.add(&quot;dogs&quot;);</span>
+<span class="fc" id="L85">        validWords.add(&quot;duck&quot;);</span>
+<span class="fc" id="L86">        validWords.add(&quot;ducks&quot;);</span>
+<span class="fc" id="L87">        validWords.add(&quot;easy&quot;);</span>
+<span class="fc" id="L88">        validWords.add(&quot;eat&quot;);</span>
+<span class="fc" id="L89">        validWords.add(&quot;eaten&quot;);</span>
+<span class="fc" id="L90">        validWords.add(&quot;eats&quot;);</span>
+<span class="fc" id="L91">        validWords.add(&quot;false&quot;);</span>
+<span class="fc" id="L92">        validWords.add(&quot;far&quot;);</span>
+<span class="fc" id="L93">        validWords.add(&quot;fare&quot;);</span>
+<span class="fc" id="L94">        validWords.add(&quot;fast&quot;);</span>
+<span class="fc" id="L95">        validWords.add(&quot;faster&quot;);</span>
+<span class="fc" id="L96">        validWords.add(&quot;fastest&quot;);</span>
+<span class="fc" id="L97">        validWords.add(&quot;fasts&quot;);</span>
+<span class="fc" id="L98">        validWords.add(&quot;fat&quot;);</span>
+<span class="fc" id="L99">        validWords.add(&quot;fate&quot;);</span>
+<span class="fc" id="L100">        validWords.add(&quot;fight&quot;);</span>
+<span class="fc" id="L101">        validWords.add(&quot;fighter&quot;);</span>
+<span class="fc" id="L102">        validWords.add(&quot;fin&quot;);</span>
+<span class="fc" id="L103">        validWords.add(&quot;fine&quot;);</span>
+<span class="fc" id="L104">        validWords.add(&quot;fines&quot;);</span>
+<span class="fc" id="L105">        validWords.add(&quot;finest&quot;);</span>
+<span class="fc" id="L106">        validWords.add(&quot;fins&quot;);</span>
+<span class="fc" id="L107">        validWords.add(&quot;fit&quot;);</span>
+<span class="fc" id="L108">        validWords.add(&quot;fits&quot;);</span>
+<span class="fc" id="L109">        validWords.add(&quot;fitter&quot;);</span>
+<span class="fc" id="L110">        validWords.add(&quot;float&quot;);</span>
+<span class="fc" id="L111">        validWords.add(&quot;floats&quot;);</span>
+<span class="fc" id="L112">        validWords.add(&quot;fore&quot;);</span>
+<span class="fc" id="L113">        validWords.add(&quot;fun&quot;);</span>
+<span class="fc" id="L114">        validWords.add(&quot;gem&quot;);</span>
+<span class="fc" id="L115">        validWords.add(&quot;gems&quot;);</span>
+<span class="fc" id="L116">        validWords.add(&quot;get&quot;);</span>
+<span class="fc" id="L117">        validWords.add(&quot;gets&quot;);</span>
+<span class="fc" id="L118">        validWords.add(&quot;goat&quot;);</span>
+<span class="fc" id="L119">        validWords.add(&quot;goats&quot;);</span>
+<span class="fc" id="L120">        validWords.add(&quot;gone&quot;);</span>
+<span class="fc" id="L121">        validWords.add(&quot;hand&quot;);</span>
+<span class="fc" id="L122">        validWords.add(&quot;handsome&quot;);</span>
+<span class="fc" id="L123">        validWords.add(&quot;handy&quot;);</span>
+<span class="fc" id="L124">        validWords.add(&quot;has&quot;);</span>
+<span class="fc" id="L125">        validWords.add(&quot;heat&quot;);</span>
+<span class="fc" id="L126">        validWords.add(&quot;heats&quot;);</span>
+<span class="fc" id="L127">        validWords.add(&quot;hello&quot;);</span>
+<span class="fc" id="L128">        validWords.add(&quot;help&quot;);</span>
+<span class="fc" id="L129">        validWords.add(&quot;hide&quot;);</span>
+<span class="fc" id="L130">        validWords.add(&quot;hit&quot;);</span>
+<span class="fc" id="L131">        validWords.add(&quot;hits&quot;);</span>
+<span class="fc" id="L132">        validWords.add(&quot;jail&quot;);</span>
+<span class="fc" id="L133">        validWords.add(&quot;kit&quot;);</span>
+<span class="fc" id="L134">        validWords.add(&quot;kits&quot;);</span>
+<span class="fc" id="L135">        validWords.add(&quot;kite&quot;);</span>
+<span class="fc" id="L136">        validWords.add(&quot;kites&quot;);</span>
+<span class="fc" id="L137">        validWords.add(&quot;knob&quot;);</span>
+<span class="fc" id="L138">        validWords.add(&quot;life&quot;);</span>
+<span class="fc" id="L139">        validWords.add(&quot;list&quot;);</span>
+<span class="fc" id="L140">        validWords.add(&quot;live&quot;);</span>
+<span class="fc" id="L141">        validWords.add(&quot;lives&quot;);</span>
+<span class="fc" id="L142">        validWords.add(&quot;log&quot;);</span>
+<span class="fc" id="L143">        validWords.add(&quot;logs&quot;);</span>
+<span class="fc" id="L144">        validWords.add(&quot;mast&quot;);</span>
+<span class="fc" id="L145">        validWords.add(&quot;masts&quot;);</span>
+<span class="fc" id="L146">        validWords.add(&quot;meat&quot;);</span>
+<span class="fc" id="L147">        validWords.add(&quot;meats&quot;);</span>
+<span class="fc" id="L148">        validWords.add(&quot;meet&quot;);</span>
+<span class="fc" id="L149">        validWords.add(&quot;meets&quot;);</span>
+<span class="fc" id="L150">        validWords.add(&quot;moist&quot;);</span>
+<span class="fc" id="L151">        validWords.add(&quot;moisten&quot;);</span>
+<span class="fc" id="L152">        validWords.add(&quot;mold&quot;);</span>
+<span class="fc" id="L153">        validWords.add(&quot;most&quot;);</span>
+<span class="fc" id="L154">        validWords.add(&quot;orange&quot;);</span>
+<span class="fc" id="L155">        validWords.add(&quot;net&quot;);</span>
+<span class="fc" id="L156">        validWords.add(&quot;nets&quot;);</span>
+<span class="fc" id="L157">        validWords.add(&quot;nose&quot;);</span>
+<span class="fc" id="L158">        validWords.add(&quot;oat&quot;);</span>
+<span class="fc" id="L159">        validWords.add(&quot;old&quot;);</span>
+<span class="fc" id="L160">        validWords.add(&quot;ore&quot;);</span>
+<span class="fc" id="L161">        validWords.add(&quot;part&quot;);</span>
+<span class="fc" id="L162">        validWords.add(&quot;parts&quot;);</span>
+<span class="fc" id="L163">        validWords.add(&quot;pin&quot;);</span>
+<span class="fc" id="L164">        validWords.add(&quot;pine&quot;);</span>
+<span class="fc" id="L165">        validWords.add(&quot;pines&quot;);</span>
+<span class="fc" id="L166">        validWords.add(&quot;pins&quot;);</span>
+<span class="fc" id="L167">        validWords.add(&quot;poor&quot;);</span>
+<span class="fc" id="L168">        validWords.add(&quot;port&quot;);</span>
+<span class="fc" id="L169">        validWords.add(&quot;ports&quot;);</span>
+<span class="fc" id="L170">        validWords.add(&quot;pour&quot;);</span>
+<span class="fc" id="L171">        validWords.add(&quot;pours&quot;);</span>
+<span class="fc" id="L172">        validWords.add(&quot;pot&quot;);</span>
+<span class="fc" id="L173">        validWords.add(&quot;pots&quot;);</span>
+<span class="fc" id="L174">        validWords.add(&quot;put&quot;);</span>
+<span class="fc" id="L175">        validWords.add(&quot;puts&quot;);</span>
+<span class="fc" id="L176">        validWords.add(&quot;quaint&quot;);</span>
+<span class="fc" id="L177">        validWords.add(&quot;queen&quot;);</span>
+<span class="fc" id="L178">        validWords.add(&quot;queens&quot;);</span>
+<span class="fc" id="L179">        validWords.add(&quot;quiet&quot;);</span>
+<span class="fc" id="L180">        validWords.add(&quot;quiets&quot;);</span>
+<span class="fc" id="L181">        validWords.add(&quot;quick&quot;);</span>
+<span class="fc" id="L182">        validWords.add(&quot;quickly&quot;);</span>
+<span class="fc" id="L183">        validWords.add(&quot;quit&quot;);</span>
+<span class="fc" id="L184">        validWords.add(&quot;quits&quot;);</span>
+<span class="fc" id="L185">        validWords.add(&quot;quite&quot;);</span>
+<span class="fc" id="L186">        validWords.add(&quot;quote&quot;);</span>
+<span class="fc" id="L187">        validWords.add(&quot;quoted&quot;);</span>
+<span class="fc" id="L188">        validWords.add(&quot;quotes&quot;);</span>
+<span class="fc" id="L189">        validWords.add(&quot;rat&quot;);</span>
+<span class="fc" id="L190">        validWords.add(&quot;rate&quot;);</span>
+<span class="fc" id="L191">        validWords.add(&quot;rated&quot;);</span>
+<span class="fc" id="L192">        validWords.add(&quot;rates&quot;);</span>
+<span class="fc" id="L193">        validWords.add(&quot;ray&quot;);</span>
+<span class="fc" id="L194">        validWords.add(&quot;rays&quot;);</span>
+<span class="fc" id="L195">        validWords.add(&quot;rest&quot;);</span>
+<span class="fc" id="L196">        validWords.add(&quot;rests&quot;);</span>
+<span class="fc" id="L197">        validWords.add(&quot;resume&quot;);</span>
+<span class="fc" id="L198">        validWords.add(&quot;return&quot;);</span>
+<span class="fc" id="L199">        validWords.add(&quot;rob&quot;);</span>
+<span class="fc" id="L200">        validWords.add(&quot;rot&quot;);</span>
+<span class="fc" id="L201">        validWords.add(&quot;safe&quot;);</span>
+<span class="fc" id="L202">        validWords.add(&quot;safety&quot;);</span>
+<span class="fc" id="L203">        validWords.add(&quot;sane&quot;);</span>
+<span class="fc" id="L204">        validWords.add(&quot;sanity&quot;);</span>
+<span class="fc" id="L205">        validWords.add(&quot;sat&quot;);</span>
+<span class="fc" id="L206">        validWords.add(&quot;saw&quot;);</span>
+<span class="fc" id="L207">        validWords.add(&quot;saws&quot;);</span>
+<span class="fc" id="L208">        validWords.add(&quot;sea&quot;);</span>
+<span class="fc" id="L209">        validWords.add(&quot;seas&quot;);</span>
+<span class="fc" id="L210">        validWords.add(&quot;seat&quot;);</span>
+<span class="fc" id="L211">        validWords.add(&quot;see&quot;);</span>
+<span class="fc" id="L212">        validWords.add(&quot;seed&quot;);</span>
+<span class="fc" id="L213">        validWords.add(&quot;seeds&quot;);</span>
+<span class="fc" id="L214">        validWords.add(&quot;seen&quot;);</span>
+<span class="fc" id="L215">        validWords.add(&quot;sees&quot;);</span>
+<span class="fc" id="L216">        validWords.add(&quot;sent&quot;);</span>
+<span class="fc" id="L217">        validWords.add(&quot;set&quot;);</span>
+<span class="fc" id="L218">        validWords.add(&quot;sets&quot;);</span>
+<span class="fc" id="L219">        validWords.add(&quot;settle&quot;);</span>
+<span class="fc" id="L220">        validWords.add(&quot;settles&quot;);</span>
+<span class="fc" id="L221">        validWords.add(&quot;show&quot;);</span>
+<span class="fc" id="L222">        validWords.add(&quot;shows&quot;);</span>
+<span class="fc" id="L223">        validWords.add(&quot;sit&quot;);</span>
+<span class="fc" id="L224">        validWords.add(&quot;sits&quot;);</span>
+<span class="fc" id="L225">        validWords.add(&quot;slog&quot;);</span>
+<span class="fc" id="L226">        validWords.add(&quot;slogs&quot;);</span>
+<span class="fc" id="L227">        validWords.add(&quot;soon&quot;);</span>
+<span class="fc" id="L228">        validWords.add(&quot;sow&quot;);</span>
+<span class="fc" id="L229">        validWords.add(&quot;star&quot;);</span>
+<span class="fc" id="L230">        validWords.add(&quot;starred&quot;);</span>
+<span class="fc" id="L231">        validWords.add(&quot;stars&quot;);</span>
+<span class="fc" id="L232">        validWords.add(&quot;stare&quot;);</span>
+<span class="fc" id="L233">        validWords.add(&quot;steer&quot;);</span>
+<span class="fc" id="L234">        validWords.add(&quot;stop&quot;);</span>
+<span class="fc" id="L235">        validWords.add(&quot;stopped&quot;);</span>
+<span class="fc" id="L236">        validWords.add(&quot;stopper&quot;);</span>
+<span class="fc" id="L237">        validWords.add(&quot;stops&quot;);</span>
+<span class="fc" id="L238">        validWords.add(&quot;store&quot;);</span>
+<span class="fc" id="L239">        validWords.add(&quot;stores&quot;);</span>
+<span class="fc" id="L240">        validWords.add(&quot;stored&quot;);</span>
+<span class="fc" id="L241">        validWords.add(&quot;stub&quot;);</span>
+<span class="fc" id="L242">        validWords.add(&quot;stubs&quot;);</span>
+<span class="fc" id="L243">        validWords.add(&quot;tar&quot;);</span>
+<span class="fc" id="L244">        validWords.add(&quot;tare&quot;);</span>
+<span class="fc" id="L245">        validWords.add(&quot;tea&quot;);</span>
+<span class="fc" id="L246">        validWords.add(&quot;teas&quot;);</span>
+<span class="fc" id="L247">        validWords.add(&quot;tee&quot;);</span>
+<span class="fc" id="L248">        validWords.add(&quot;teed&quot;);</span>
+<span class="fc" id="L249">        validWords.add(&quot;teen&quot;);</span>
+<span class="fc" id="L250">        validWords.add(&quot;teens&quot;);</span>
+<span class="fc" id="L251">        validWords.add(&quot;tees&quot;);</span>
+<span class="fc" id="L252">        validWords.add(&quot;ten&quot;);</span>
+<span class="fc" id="L253">        validWords.add(&quot;tens&quot;);</span>
+<span class="fc" id="L254">        validWords.add(&quot;test&quot;);</span>
+<span class="fc" id="L255">        validWords.add(&quot;tests&quot;);</span>
+<span class="fc" id="L256">        validWords.add(&quot;tomorrow&quot;);</span>
+<span class="fc" id="L257">        validWords.add(&quot;ton&quot;);</span>
+<span class="fc" id="L258">        validWords.add(&quot;tons&quot;);</span>
+<span class="fc" id="L259">        validWords.add(&quot;true&quot;);</span>
+<span class="fc" id="L260">        validWords.add(&quot;turret&quot;);</span>
+<span class="fc" id="L261">        validWords.add(&quot;under&quot;);</span>
+<span class="fc" id="L262">        validWords.add(&quot;utmost&quot;);</span>
+<span class="fc" id="L263">        validWords.add(&quot;vale&quot;);</span>
+<span class="fc" id="L264">        validWords.add(&quot;vales&quot;);</span>
+<span class="fc" id="L265">        validWords.add(&quot;valor&quot;);</span>
+<span class="fc" id="L266">        validWords.add(&quot;vanity&quot;);</span>
+<span class="fc" id="L267">        validWords.add(&quot;variety&quot;);</span>
+<span class="fc" id="L268">        validWords.add(&quot;various&quot;);</span>
+<span class="fc" id="L269">        validWords.add(&quot;vary&quot;);</span>
+<span class="fc" id="L270">        validWords.add(&quot;very&quot;);</span>
+<span class="fc" id="L271">        validWords.add(&quot;wag&quot;);</span>
+<span class="fc" id="L272">        validWords.add(&quot;wage&quot;);</span>
+<span class="fc" id="L273">        validWords.add(&quot;wages&quot;);</span>
+<span class="fc" id="L274">        validWords.add(&quot;waggle&quot;);</span>
+<span class="fc" id="L275">        validWords.add(&quot;was&quot;);</span>
+<span class="fc" id="L276">        validWords.add(&quot;wed&quot;);</span>
+<span class="fc" id="L277">        validWords.add(&quot;what&quot;);</span>
+<span class="fc" id="L278">        validWords.add(&quot;woo&quot;);</span>
+<span class="fc" id="L279">        validWords.add(&quot;woos&quot;);</span>
+<span class="fc" id="L280">        validWords.add(&quot;worry&quot;);</span>
+<span class="fc" id="L281">        validWords.add(&quot;yap&quot;);</span>
+<span class="fc" id="L282">        validWords.add(&quot;yaps&quot;);</span>
+<span class="fc" id="L283">        validWords.add(&quot;yell&quot;);</span>
+<span class="fc" id="L284">        validWords.add(&quot;yellow&quot;);</span>
+<span class="fc" id="L285">        validWords.add(&quot;yes&quot;);</span>
+<span class="fc" id="L286">        validWords.add(&quot;yesterday&quot;);</span>
+<span class="fc" id="L287">        validWords.add(&quot;zap&quot;);</span>
+<span class="fc" id="L288">        validWords.add(&quot;zaps&quot;);</span>
+<span class="fc" id="L289">        validWords.add(&quot;zebra&quot;);</span>
+<span class="fc" id="L290">        validWords.add(&quot;zebras&quot;);</span>
+<span class="fc" id="L291">        validWords.add(&quot;zero&quot;);</span>
+<span class="fc" id="L292">        validWords.add(&quot;zest&quot;);</span>
+<span class="fc" id="L293">        validWords.add(&quot;zesty&quot;);</span>
+<span class="fc" id="L294">        validWords.add(&quot;zip&quot;);</span>
+<span class="fc" id="L295">        validWords.add(&quot;zips&quot;);</span>
+<span class="fc" id="L296">        validWords.add(&quot;zipped&quot;);</span>
+<span class="fc" id="L297">        validWords.add(&quot;zipper&quot;);</span>
+<span class="fc" id="L298">        validWords.add(&quot;zippers&quot;);</span>
+<span class="fc" id="L299">        validWords.add(&quot;zone&quot;);</span>
+<span class="fc" id="L300">        validWords.add(&quot;zoned&quot;);</span>
+<span class="fc" id="L301">        validWords.add(&quot;zones&quot;);</span>
+<span class="fc" id="L302">        validWords.add(&quot;zoo&quot;);</span>
+<span class="fc" id="L303">        validWords.add(&quot;zoos&quot;);</span>
+
+<span class="fc" id="L305">        wordTree.seed(validWords);</span>
+<span class="fc" id="L306">    }</span>
+
+    private boolean canAdvanceToBoardLocation(int gameBoardSize,
+                                              int row,
+                                              int column,
+                                              BoardLocationsVisited boardLocationsVisited) {
+<span class="fc bfc" id="L312" title="All 8 branches covered.">        return (((row &gt;= 0) &amp;&amp; (row &lt; gameBoardSize)) &amp;&amp;</span>
+                ((column &gt;= 0) &amp;&amp; (column &lt; gameBoardSize)) &amp;&amp;
+<span class="fc bfc" id="L314" title="All 2 branches covered.">                !boardLocationsVisited.hasBeenVisited(row, column));</span>
+    }
+
+    private Set&lt;String&gt; findWordsPresent(int gameBoardSize,
+                                         DieLetter[][] gameBoard,
+                                         String partialWordInProgress,
+                                         int row,
+                                         int column,
+                                         BoardLocationsVisited boardLocationsVisited) {
+<span class="fc" id="L323">        Set&lt;String&gt; result = new HashSet&lt;&gt;();</span>
+
+        // Lets see if the partial word we have already formed is found in the list of valid words. Recall in Boggle
+        // that words must be at least three letters in length and cannot be pronouns.
+<span class="fc bfc" id="L327" title="All 4 branches covered.">        if (partialWordInProgress.length() &gt;= 3 &amp;&amp; wordTree.isValidWord(partialWordInProgress)) {</span>
+<span class="fc" id="L328">            result.add(partialWordInProgress);</span>
+        }
+
+        // If the partial word in progress cannot possibly lead to valid words, we can just stop right here.
+<span class="fc bfc" id="L332" title="All 2 branches covered.">        if (!wordTree.hasWordsThatBeginWith(partialWordInProgress)) {</span>
+<span class="fc" id="L333">            return result;</span>
+        }
+
+        // Make use of BiConsumer here to make the remaining reading of how this method is implemented much easier
+        // to understand with far less code to read.
+<span class="fc" id="L338">        BiConsumer&lt;Integer, Integer&gt; growWordInProgress = (pr, pc) -&gt; {</span>
+<span class="fc" id="L339">            final int proposedRow = pr.intValue();</span>
+<span class="fc" id="L340">            final int proposedColumn = pc.intValue();</span>
+<span class="fc bfc" id="L341" title="All 2 branches covered.">            if (canAdvanceToBoardLocation(gameBoardSize, proposedRow, proposedColumn, boardLocationsVisited)) {</span>
+                // We clone the argument boardLocationsVisited so as to not disturb the other
+                // consumers of it in this method.
+<span class="fc" id="L344">                BoardLocationsVisited clone = boardLocationsVisited.clone();</span>
+<span class="fc" id="L345">                clone.markVisited(proposedRow, proposedColumn);</span>
+<span class="fc" id="L346">                result.addAll(findWordsPresent(gameBoardSize,</span>
+                                               gameBoard,
+<span class="fc" id="L348">                                               partialWordInProgress + gameBoard[proposedRow][proposedColumn].asWordPart(),</span>
+                                               proposedRow,
+                                               proposedColumn,
+                                               clone));
+            }
+<span class="fc" id="L353">        };</span>
+
+        // Now lets attempt to grow the word we are building by one more letter by including all of the possible
+        // choices around our current letter as possible.
+<span class="fc" id="L357">        growWordInProgress.accept(row - 1, column - 1);</span>
+<span class="fc" id="L358">        growWordInProgress.accept(row - 1, column);</span>
+<span class="fc" id="L359">        growWordInProgress.accept(row - 1, column + 1);</span>
+<span class="fc" id="L360">        growWordInProgress.accept(row, column - 1);</span>
+<span class="fc" id="L361">        growWordInProgress.accept(row, column + 1);</span>
+<span class="fc" id="L362">        growWordInProgress.accept(row + 1, column - 1);</span>
+<span class="fc" id="L363">        growWordInProgress.accept(row + 1, column);</span>
+<span class="fc" id="L364">        growWordInProgress.accept(row + 1, column + 1);</span>
+
+<span class="fc" id="L366">        return result;</span>
+    }
+
+    Set&lt;String&gt; findWordsPresent(int gameBoardSize, DieLetter[][] gameBoard) {
+<span class="fc" id="L370">        Set&lt;String&gt; result = new HashSet&lt;&gt;();</span>
+
+<span class="fc bfc" id="L372" title="All 2 branches covered.">        for (int row = 0; row &lt; gameBoardSize; row++) {</span>
+<span class="fc bfc" id="L373" title="All 2 branches covered.">            for (int column = 0; column &lt; gameBoardSize; column++) {</span>
+<span class="fc" id="L374">                String firstLetterOfWord = &quot;&quot; + gameBoard[row][column].asWordPart();</span>
+<span class="fc" id="L375">                BoardLocationsVisited boardLocationsVisited = new BoardLocationsVisited(gameBoardSize);</span>
+<span class="fc" id="L376">                boardLocationsVisited.markVisited(row, column);</span>
+<span class="fc" id="L377">                result.addAll(findWordsPresent(gameBoardSize,</span>
+                                               gameBoard,
+                                               firstLetterOfWord,
+                                               row,
+                                               column,
+                                               boardLocationsVisited));
+            }
+        }
+
+<span class="fc" id="L386">        return result;</span>
+    }
+
+    private void displayGameBoard(int gameBoardSize, DieLetter[][] gameBoard) {
+<span class="nc" id="L390">        System.out.println(&quot;Here is the game board:&quot;);</span>
+<span class="nc bnc" id="L391" title="All 2 branches missed.">        System.out.println(gameBoardSize == 4 ? GAME_BOARD_HEADER_4X4 : GAME_BOARD_HEADER_5x5);</span>
+
+<span class="nc bnc" id="L393" title="All 2 branches missed.">        for (int row = 0; row &lt; gameBoardSize; row++) {</span>
+<span class="nc" id="L394">            System.out.print(&quot;\t&quot;);</span>
+<span class="nc bnc" id="L395" title="All 2 branches missed.">            for (int col = 0; col &lt; gameBoardSize; col++) {</span>
+<span class="nc" id="L396">                DieLetter dieLetter = gameBoard[row][col];</span>
+<span class="nc bnc" id="L397" title="All 2 branches missed.">                if (dieLetter.isQu()) {</span>
+<span class="nc" id="L398">                    System.out.print(&quot;Qu&quot;);</span>
+                } else {
+<span class="nc" id="L400">                    String letter = &quot;&quot; + dieLetter.getLetter();</span>
+<span class="nc" id="L401">                    System.out.print(letter.toUpperCase() + &quot; &quot;);</span>
+                }
+<span class="nc" id="L403">                System.out.print(&quot; &quot;);</span>
+            }
+<span class="nc" id="L405">            System.out.println(&quot;&quot;);</span>
+        }
+
+<span class="nc bnc" id="L408" title="All 2 branches missed.">        System.out.println(gameBoardSize == 4 ? GAME_BOARD_HEADER_4X4 : GAME_BOARD_HEADER_5x5);</span>
+<span class="nc" id="L409">    }</span>
+
+    void playGame(BoggleDice boggleDice) {
+<span class="nc" id="L412">        DieLetter[][] gameBoard = boggleDice.shake();</span>
+<span class="nc" id="L413">        displayGameBoard(boggleDice.size(), gameBoard);</span>
+
+<span class="nc" id="L415">        Set&lt;String&gt; validWordsFound = findWordsPresent(boggleDice.size(), gameBoard);</span>
+<span class="nc" id="L416">        List&lt;String&gt; sortedValidWordsFound = new ArrayList(validWordsFound);</span>
+<span class="nc" id="L417">        Collections.sort(sortedValidWordsFound);</span>
+<span class="nc" id="L418">        System.out.println(&quot;Found &quot; + sortedValidWordsFound.size() + &quot; of &quot; + validWords.size() + &quot; valid words present in this game board:&quot;);</span>
+<span class="nc bnc" id="L419" title="All 2 branches missed.">        for (String validWordFound : sortedValidWordsFound) {</span>
+<span class="nc" id="L420">            System.out.println(&quot;\t&quot; + validWordFound);</span>
+<span class="nc" id="L421">        }</span>
+<span class="nc" id="L422">    }</span>
+
+    private static String getUserAnswer() {
+<span class="nc" id="L425">        final String USER_PROMPT = &quot;Enter 4 to use 4x4 board, 5 to use 5x5 board, or n to exit :&quot;;</span>
+<span class="nc" id="L426">        System.out.println(USER_PROMPT);</span>
+<span class="nc" id="L427">        byte[] endUserProvidedValue = new byte[80];</span>
+        try {
+<span class="nc" id="L429">            System.in.read(endUserProvidedValue);</span>
+<span class="nc" id="L430">        } catch (IOException ignored) {</span>
+<span class="nc" id="L431">            System.exit(1);</span>
+<span class="nc" id="L432">        }</span>
+<span class="nc" id="L433">        return new String(endUserProvidedValue).trim();</span>
+    }
+
+    public static void main(String[] args) {
+<span class="nc" id="L437">        Boggle controller = new Boggle();</span>
+
+        while (true) {
+<span class="nc" id="L440">            String userAnswer = getUserAnswer();</span>
+<span class="nc bnc" id="L441" title="All 4 branches missed.">            switch (userAnswer) {</span>
+                case &quot;4&quot;:
+<span class="nc" id="L443">                    controller.playGame(BoggleDice.for4x4Board());</span>
+<span class="nc" id="L444">                    break;</span>
+                case &quot;5&quot;:
+<span class="nc" id="L446">                    controller.playGame(BoggleDice.for5x5Board());</span>
+<span class="nc" id="L447">                    break;</span>
+                case &quot;n&quot;:
+                case &quot;N&quot;:
+<span class="nc" id="L450">                    System.out.println(&quot;Goodbye&quot;);</span>
+<span class="nc" id="L451">                    System.exit(0);</span>
+                default:
+<span class="nc" id="L453">                    System.err.println(&quot;Invalid input &lt;&quot; + userAnswer + &quot;&gt;&quot;);</span>
+            }
+<span class="nc" id="L455">        }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

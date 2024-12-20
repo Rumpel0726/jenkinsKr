@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ConservativeUseOfGetOutOfJailFreeCardPolicy.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">games</a> &gt; <a href="index.source.html" class="el_package">org.douggschwind.games.boardgames.monopoly.policy</a> &gt; <span class="el_source">ConservativeUseOfGetOutOfJailFreeCardPolicy.java</span></div><h1>ConservativeUseOfGetOutOfJailFreeCardPolicy.java</h1><pre class="source lang-java linenums">package org.douggschwind.games.boardgames.monopoly.policy;
+
+import org.douggschwind.games.boardgames.monopoly.Player;
+
+/**
+ * In this implementation of this policy, the Player does care if there are few Titles
+ * available for purchase. If there are few or even none, sit out a turn or two in Jail
+ * to hopefully save money due to landing on Titles owned by opponents. Of course, this
+ * policy isn't well informed, doesn't know which properties are available, how close they
+ * are to the Jail board spot, etc. That would be an advanced exercise to consider.
+ * @author Doug Gschwind
+ */
+<span class="fc" id="L13">public class ConservativeUseOfGetOutOfJailFreeCardPolicy implements UseOfGetOutOfJailFreeCardPolicy {</span>
+
+	@Override
+	public boolean shouldUseGetOutOfJailFreeCard(Player player, int numberTitlesAvailableForPurchase) {
+<span class="nc bnc" id="L17" title="All 2 branches missed.">		if (player.getBankAccountBalance() &lt; 230) {</span>
+			// Don't have much money to buy Titles anyway, hang out in Jail for another
+			// turn or two. $230 is a rough approximation of the average cost to purchase
+			// a Title on the board.
+<span class="nc" id="L21">			return false;</span>
+		}
+		
+		// Just a WAG at a reasonable number here.
+<span class="nc bnc" id="L25" title="All 2 branches missed.">		return (numberTitlesAvailableForPurchase &gt;= 5);</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

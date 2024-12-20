@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DeedRecorder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">games</a> &gt; <a href="index.source.html" class="el_package">org.douggschwind.games.boardgames.monopoly</a> &gt; <span class="el_source">DeedRecorder.java</span></div><h1>DeedRecorder.java</h1><pre class="source lang-java linenums">package org.douggschwind.games.boardgames.monopoly;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.douggschwind.games.boardgames.monopoly.title.TitleDeed;
+
+/**
+ * Houses the BuildingSummary for each TitleDeed.
+ * @author Doug Gschwind
+ */
+<span class="nc" id="L12">public class DeedRecorder {</span>
+	
+<span class="fc" id="L14">	private static final Map&lt;TitleDeed, BuildingSummary&gt; recordedDeeds = new HashMap&lt;&gt;();</span>
+	
+	public static BuildingSummary getBuildingSummary(TitleDeed titleDeed) {
+<span class="fc" id="L17">		return recordedDeeds.get(titleDeed);</span>
+	}
+	
+	public static void addDeed(TitleDeed titleDeed) {
+<span class="fc" id="L21">		recordedDeeds.put(titleDeed, new BuildingSummary());</span>
+<span class="fc" id="L22">	}</span>
+	
+	public static void addHouse(TitleDeed titleDeed) {
+<span class="nc" id="L25">		BuildingSummary buildingSummaryForDeed = getBuildingSummary(titleDeed);</span>
+<span class="nc" id="L26">		buildingSummaryForDeed.addHouse();</span>
+<span class="nc" id="L27">	}</span>
+	
+	public static void clear() {
+<span class="nc" id="L30">		recordedDeeds.clear();</span>
+<span class="nc" id="L31">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
