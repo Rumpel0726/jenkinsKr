@@ -52,7 +52,7 @@ public class OneWildCardHand extends WildCardHand {
 <span class="fc bfc" id="L52" title="All 2 branches covered.">				if (numOccurrencesOfKind == 3) {</span>
 					// Player has natural three of a kind.
 <span class="fc" id="L54">					return createFourOfAKind(cardKind);</span>
-<span class="fc bfc" id="L55" title="All 2 branches covered.">				} else if (numOccurrencesOfKind == 2) {</span>
+<span class="pc bpc" id="L55" title="1 of 2 branches missed.">				} else if (numOccurrencesOfKind == 2) {</span>
 					// Player has two natural pair. Find the higher valued pair
 					// to determine the strength of their Full House hand.
 <span class="fc" id="L58">					FrenchSuitedPlayingCard.Kind firstPairKind = cardKind;</span>
@@ -66,7 +66,7 @@ public class OneWildCardHand extends WildCardHand {
 					
 <span class="pc bpc" id="L67" title="1 of 2 branches missed.">					return new FullHouse(firstPairKind.hasHigherRank(secondPairKind).booleanValue() ? firstPairKind : secondPairKind);</span>
 				}
-<span class="fc" id="L69">			}</span>
+<span class="nc" id="L69">			}</span>
 <span class="nc" id="L70">			return null; // Should never get here</span>
 		}
 		

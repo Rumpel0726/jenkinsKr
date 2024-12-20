@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="org.douggschwind.games.common.DeckOfCardsTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2024-12-20T08:28:05" hostname="MSI" time="0.001">
+<testsuite name="org.douggschwind.games.common.DeckOfCardsTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2024-12-20T08:35:27" hostname="MSI" time="0.0">
   <properties/>
-  <testcase name="testDeckOfCardsLifecycle()" classname="org.douggschwind.games.common.DeckOfCardsTest" time="0.001"/>
+  <testcase name="testDeckOfCardsLifecycle()" classname="org.douggschwind.games.common.DeckOfCardsTest" time="0.0"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

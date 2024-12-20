@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="org.douggschwind.games.chess.SquareTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2024-12-20T08:28:05" hostname="MSI" time="0.004">
+<testsuite name="org.douggschwind.games.chess.SquareTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2024-12-20T08:35:27" hostname="MSI" time="0.001">
   <properties/>
-  <testcase name="testEqualsAndHashcode()" classname="org.douggschwind.games.chess.SquareTest" time="0.004"/>
+  <testcase name="testEqualsAndHashcode()" classname="org.douggschwind.games.chess.SquareTest" time="0.001"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

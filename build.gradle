@@ -16,7 +16,7 @@ tasks.jacocoTestReport {
     dependsOn tasks.test // Тесты должны выполняться перед генерацией отчета
     reports {
         xml.required = true
-        csv.required = true
+        csv.required = false
     }
 
 

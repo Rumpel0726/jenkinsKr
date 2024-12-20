@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="org.douggschwind.games.cardgames.poker.WesternHandStrengthTest" tests="13" skipped="0" failures="0" errors="0" timestamp="2024-12-20T08:28:04" hostname="MSI" time="0.037">
+<testsuite name="org.douggschwind.games.cardgames.poker.WesternHandStrengthTest" tests="13" skipped="0" failures="0" errors="0" timestamp="2024-12-20T08:35:26" hostname="MSI" time="0.017">
   <properties/>
-  <testcase name="testDetermineHandStrengthAceLowStraightFlush()" classname="org.douggschwind.games.cardgames.poker.WesternHandStrengthTest" time="0.003"/>
+  <testcase name="testDetermineHandStrengthAceLowStraightFlush()" classname="org.douggschwind.games.cardgames.poker.WesternHandStrengthTest" time="0.002"/>
   <testcase name="testDetermineHandStrengthStraight()" classname="org.douggschwind.games.cardgames.poker.WesternHandStrengthTest" time="0.001"/>
   <testcase name="testDetermineHandStrengthRoyalFlush()" classname="org.douggschwind.games.cardgames.poker.WesternHandStrengthTest" time="0.001"/>
-  <testcase name="testDetermineHandStrengthFlush()" classname="org.douggschwind.games.cardgames.poker.WesternHandStrengthTest" time="0.002"/>
-  <testcase name="testDetermineHandStrengthHighCard()" classname="org.douggschwind.games.cardgames.poker.WesternHandStrengthTest" time="0.001"/>
-  <testcase name="testDetermineHandStrengthThreeOfAKind()" classname="org.douggschwind.games.cardgames.poker.WesternHandStrengthTest" time="0.004"/>
-  <testcase name="testDetermineHandStrengthFullHouse()" classname="org.douggschwind.games.cardgames.poker.WesternHandStrengthTest" time="0.002"/>
-  <testcase name="testDetermineHandStrengthTwoPair()" classname="org.douggschwind.games.cardgames.poker.WesternHandStrengthTest" time="0.002"/>
-  <testcase name="testDetermineHandStrengthAceLowStraight()" classname="org.douggschwind.games.cardgames.poker.WesternHandStrengthTest" time="0.002"/>
+  <testcase name="testDetermineHandStrengthFlush()" classname="org.douggschwind.games.cardgames.poker.WesternHandStrengthTest" time="0.0"/>
+  <testcase name="testDetermineHandStrengthHighCard()" classname="org.douggschwind.games.cardgames.poker.WesternHandStrengthTest" time="0.0"/>
+  <testcase name="testDetermineHandStrengthThreeOfAKind()" classname="org.douggschwind.games.cardgames.poker.WesternHandStrengthTest" time="0.001"/>
+  <testcase name="testDetermineHandStrengthFullHouse()" classname="org.douggschwind.games.cardgames.poker.WesternHandStrengthTest" time="0.0"/>
+  <testcase name="testDetermineHandStrengthTwoPair()" classname="org.douggschwind.games.cardgames.poker.WesternHandStrengthTest" time="0.001"/>
+  <testcase name="testDetermineHandStrengthAceLowStraight()" classname="org.douggschwind.games.cardgames.poker.WesternHandStrengthTest" time="0.0"/>
   <testcase name="testDetermineHandStrengthPair()" classname="org.douggschwind.games.cardgames.poker.WesternHandStrengthTest" time="0.001"/>
-  <testcase name="testIsStrongerThan()" classname="org.douggschwind.games.cardgames.poker.WesternHandStrengthTest" time="0.003"/>
-  <testcase name="testDetermineHandStrengthFourOfAKind()" classname="org.douggschwind.games.cardgames.poker.WesternHandStrengthTest" time="0.001"/>
+  <testcase name="testIsStrongerThan()" classname="org.douggschwind.games.cardgames.poker.WesternHandStrengthTest" time="0.0"/>
+  <testcase name="testDetermineHandStrengthFourOfAKind()" classname="org.douggschwind.games.cardgames.poker.WesternHandStrengthTest" time="0.0"/>
   <testcase name="testDetermineHandStrengthStraightFlush()" classname="org.douggschwind.games.cardgames.poker.WesternHandStrengthTest" time="0.001"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
