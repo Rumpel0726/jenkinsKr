@@ -1,0 +1,15 @@
+org.douggschwind.games.boardgames.monopoly
+org.douggschwind.games.boardgames.monopoly.actioncard
+org.douggschwind.games.boardgames.monopoly.policy
+org.douggschwind.games.boardgames.monopoly.space
+org.douggschwind.games.boardgames.monopoly.title
+org.douggschwind.games.cardgames.common
+org.douggschwind.games.cardgames.euchre
+org.douggschwind.games.cardgames.poker
+org.douggschwind.games.cardgames.poker.common
+org.douggschwind.games.cardgames.wildcardpoker
+org.douggschwind.games.chess
+org.douggschwind.games.chess.moves
+org.douggschwind.games.chess.piece
+org.douggschwind.games.common
+org.douggschwind.games.dicegames.boggle

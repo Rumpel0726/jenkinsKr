@@ -58,3 +58,11 @@ allprojects {
     }
 }
 
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'org.douggschwind.Main' // Укажите ваш главный класс с методом main
+        )
+    }
+}
+
